@@ -3,3 +3,11 @@
 // found in the LICENSE file.
 
 package models
+
+func IsMigrationNeeded() bool {
+	return false
+}
+
+func Migrate() {
+
+}
