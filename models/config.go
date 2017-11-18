@@ -4,18 +4,19 @@
 
 package models
 
-import (
-	"strconv"
-	"github.com/s-gv/femtowiki/models/db"
+import "github.com/s-gv/femtowiki/models/db"
+
+const (
+	Version = "version"
 )
 
-func Version() int {
-	row := db.QueryRow(`SELECT val FROM configs WHERE name=?;`, "version")
-	sval := "0"
-	if err := row.Scan(&sval); err == nil {
-		if ival, err := strconv.Atoi(sval); err == nil {
-			return ival
+func WriteConfig(key string, val string) {
+	var oldVal string
+	if db.QueryRow(`SELECT val FROM configs WHERE name=?;`, key).Scan(&oldVal) == nil {
+		if oldVal != val {
+			db.Exec(`UPDATE configs SET val=? WHERE name=?;`, val, key)
 		}
+	} else {
+		db.Exec(`INSERT INTO configs(name, val) values(?, ?);`, key, val)
 	}
-	return 0
 }

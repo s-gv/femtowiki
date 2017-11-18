@@ -130,3 +130,14 @@ func Exec(query string, args ...interface{}) {
 		log.Panicf("[ERROR] Error executing %s. Err msg: %s\n", query, err)
 	}
 }
+
+func Version() int {
+	row := db.QueryRow(`SELECT val FROM configs WHERE name=?;`, "version")
+	sval := "0"
+	if err := row.Scan(&sval); err == nil {
+		if ival, err := strconv.Atoi(sval); err == nil {
+			return ival
+		}
+	}
+	return 0
+}

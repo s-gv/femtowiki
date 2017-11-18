@@ -4,10 +4,125 @@
 
 package models
 
+import (
+	"github.com/s-gv/femtowiki/models/db"
+	"log"
+)
+
+const ModelVersion = 1
+
+func Migration1() {
+	db.Exec(`CREATE TABLE configs(name VARCHAR(250), val TEXT);`)
+	db.Exec(`CREATE UNIQUE INDEX configs_key_index on configs(name);`)
+
+	db.Exec(`CREATE TABLE users(
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		username VARCHAR(32) NOT NULL,
+		passwdhash VARCHAR(250) NOT NULL,
+		email VARCHAR(250) DEFAULT '',
+		reset_token VARCHAR(250) DEFAULT '',
+		reset_token_date INTEGER DEFAULT 0,
+		is_banned INTEGER DEFAULT 0,
+		is_superuser INTEGER DEFAULT 0,
+		created_date INTEGER DEFAULT 0,
+		updated_date INTEGER DEFAULT 0
+	);`)
+	db.Exec(`CREATE UNIQUE INDEX users_username_index on users(username);`)
+	db.Exec(`CREATE INDEX users_email_index on users(email);`)
+	db.Exec(`CREATE INDEX users_reset_token_index on users(reset_token);`)
+	db.Exec(`CREATE INDEX users_created_index on users(created_date);`)
+
+	db.Exec(`CREATE TABLE groups(
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		name VARCHAR(250) DEFAULT '',
+		admingroupid INTEGER REFERENCES groups(id) ON DELETE SET NULL,
+		created_date INTEGER DEFAULT 0,
+		updated_date INTEGER DEFAULT 0
+	);`)
+	db.Exec(`CREATE INDEX groups_admingroupid_index on groups(admingroupid);`)
+
+	db.Exec(`CREATE TABLE sessions(
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		sessionid VARCHAR(250) DEFAULT '',
+		userid INTEGER REFERENCES users(id) ON DELETE CASCADE,
+		msg VARCHAR(250) DEFAULT '',
+		created_date INTEGER DEFAULT 0,
+		updated_date INTEGER DEFAULT 0
+	);`)
+	db.Exec(`CREATE INDEX sessions_sessionid_index on sessions(sessionid);`)
+	db.Exec(`CREATE INDEX sessions_userid_index on sessions(userid);`)
+
+	db.Exec(`CREATE TABLE navlinks(
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		title VARCHAR(250) DEFAULT '',
+		url VARCHAR(1024) DEFAULT '',
+		created_date INTEGER DEFAULT 0,
+		updated_date INTEGER DEFAULT 0
+	);`)
+
+	db.Exec(`CREATE TABLE footerlinks(
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		title VARCHAR(250) DEFAULT '',
+		url VARCHAR(1024) DEFAULT '',
+		created_date INTEGER DEFAULT 0,
+		updated_date INTEGER DEFAULT 0
+	);`)
+
+	db.Exec(`CREATE TABLE pages(
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		title TEXT DEFAULT '',
+		content TEXT DEFAULT '',
+		editgroupid INTEGER REFERENCES groups(id) ON DELETE SET NULL,
+		readgroupid INTEGER REFERENCES groups(id) ON DELETE SET NULL,
+		created_date INTEGER DEFAULT 0,
+		updated_date INTEGER DEFAULT 0
+	);`)
+	db.Exec(`CREATE INDEX pages_editgroupid_index on pages(editgroupid);`)
+	db.Exec(`CREATE INDEX pages_readgroupid_index on pages(readgroupid);`)
+
+	db.Exec(`CREATE TABLE comments(
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		pageid INTEGER REFERENCES pages(id) ON DELETE CASCADE,
+		userid INTEGER REFERENCES users(id) ON DELETE CASCADE,
+		content TEXT DEFAULT '',
+		pos INTEGER DEFAULT 0,
+		is_deleted INTEGER DEFAULT 0,
+		created_date INTEGER DEFAULT 0,
+		updated_date INTEGER DEFAULT 0
+	);`)
+	db.Exec(`CREATE INDEX comments_userid_created_index on comments(userid, created_date);`)
+	db.Exec(`CREATE INDEX comments_pageid_created_index on comments(pageid, created_date);`)
+	db.Exec(`CREATE INDEX comments_pageid_pos_index on comments(pageid, pos);`)
+	db.Exec(`CREATE INDEX comments_pageid_posdesc_index on comments(pageid, pos DESC);`)
+
+	db.Exec(`CREATE TABLE groupmembers(
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		userid INTEGER REFERENCES users(id) ON DELETE CASCADE,
+		groupid INTEGER REFERENCES groups(id) ON DELETE CASCADE,
+		created_date INTEGER DEFAULT 0
+	);`)
+	db.Exec(`CREATE INDEX groupmembers_userid_index on groupmembers(userid);`)
+	db.Exec(`CREATE INDEX groupmembers_groupid_index on groupmembers(groupid);`)
+}
+
 func IsMigrationNeeded() bool {
-	return false
+	return db.Version() != ModelVersion
 }
 
 func Migrate() {
+	dbver := db.Version()
+	if dbver == ModelVersion {
+		log.Panicf("[ERROR] DB migration not needed. DB up-to-date.\n")
+	} else if dbver > ModelVersion {
+		log.Panicf("[ERROR] DB version (%d) is greater than binary version (%d). Use newer binary.\n", dbver, ModelVersion)
+	}
+	for dbver < ModelVersion {
+		if dbver == 0 {
+			log.Printf("[INFO] Migrating to version 1...")
+			Migration1()
 
+			WriteConfig(Version, "1")
+		}
+		dbver = db.Version()
+	}
 }

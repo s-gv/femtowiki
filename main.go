@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-package femtowiki
+package main
 
 import (
 	"fmt"
@@ -54,7 +54,7 @@ func getCreds() (string, string) {
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
-	dsn := flag.String("dsn", "orangeforum.db", "Data source name")
+	dsn := flag.String("dsn", "femtowiki.sqlite3", "Data source name")
 	dbDriver := flag.String("dbdriver", "sqlite3", "DB driver name")
 	addr := flag.String("addr", ":9123", "Port to listen on")
 	shouldMigrate := flag.Bool("migrate", false, "Migrate DB")
@@ -74,7 +74,7 @@ func main() {
 	}
 
 	if models.IsMigrationNeeded() {
-		log.Panicf("[ERROR] DB migration needed.\n")
+		log.Fatalf("[ERROR] DB migration needed.\n")
 	}
 
 	if *createSuperUser {
