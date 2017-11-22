@@ -55,6 +55,7 @@ func Migration1() {
 	db.Exec(`CREATE TABLE navlinks(
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		title VARCHAR(250) DEFAULT '',
+		section VARCHAR(250) DEFAULT '',
 		url VARCHAR(1024) DEFAULT '',
 		created_date INTEGER DEFAULT 0,
 		updated_date INTEGER DEFAULT 0
@@ -80,21 +81,6 @@ func Migration1() {
 	db.Exec(`CREATE INDEX pages_editgroupid_index on pages(editgroupid);`)
 	db.Exec(`CREATE INDEX pages_readgroupid_index on pages(readgroupid);`)
 
-	db.Exec(`CREATE TABLE comments(
-		id INTEGER PRIMARY KEY AUTOINCREMENT,
-		pageid INTEGER REFERENCES pages(id) ON DELETE CASCADE,
-		userid INTEGER REFERENCES users(id) ON DELETE CASCADE,
-		content TEXT DEFAULT '',
-		pos INTEGER DEFAULT 0,
-		is_deleted INTEGER DEFAULT 0,
-		created_date INTEGER DEFAULT 0,
-		updated_date INTEGER DEFAULT 0
-	);`)
-	db.Exec(`CREATE INDEX comments_userid_created_index on comments(userid, created_date);`)
-	db.Exec(`CREATE INDEX comments_pageid_created_index on comments(pageid, created_date);`)
-	db.Exec(`CREATE INDEX comments_pageid_pos_index on comments(pageid, pos);`)
-	db.Exec(`CREATE INDEX comments_pageid_posdesc_index on comments(pageid, pos DESC);`)
-
 	db.Exec(`CREATE TABLE groupmembers(
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		userid INTEGER REFERENCES users(id) ON DELETE CASCADE,
@@ -103,6 +89,8 @@ func Migration1() {
 	);`)
 	db.Exec(`CREATE INDEX groupmembers_userid_index on groupmembers(userid);`)
 	db.Exec(`CREATE INDEX groupmembers_groupid_index on groupmembers(groupid);`)
+
+	// db.Exec(`CREATE VIRTUAL TABLE email USING fts5(sender, title, body);`)
 }
 
 func IsMigrationNeeded() bool {
