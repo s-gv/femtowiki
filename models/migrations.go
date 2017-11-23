@@ -39,6 +39,7 @@ func Migration1() {
 		created_date INTEGER DEFAULT 0,
 		updated_date INTEGER DEFAULT 0
 	);`)
+	db.Exec(`CREATE UNIQUE INDEX groups_name_index on groups(name);`)
 	db.Exec(`CREATE INDEX groups_admingroupid_index on groups(admingroupid);`)
 
 	db.Exec(`CREATE TABLE sessions(
@@ -61,6 +62,14 @@ func Migration1() {
 		updated_date INTEGER DEFAULT 0
 	);`)
 
+	db.Exec(`CREATE TABLE headerlinks(
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		title VARCHAR(250) DEFAULT '',
+		url VARCHAR(1024) DEFAULT '',
+		created_date INTEGER DEFAULT 0,
+		updated_date INTEGER DEFAULT 0
+	);`)
+
 	db.Exec(`CREATE TABLE footerlinks(
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		title VARCHAR(250) DEFAULT '',
@@ -71,13 +80,15 @@ func Migration1() {
 
 	db.Exec(`CREATE TABLE pages(
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
-		title TEXT DEFAULT '',
+		title VARCHAR(250) DEFAULT '',
 		content TEXT DEFAULT '',
+		version INTEGER DEFAULT 0,
 		editgroupid INTEGER REFERENCES groups(id) ON DELETE SET NULL,
 		readgroupid INTEGER REFERENCES groups(id) ON DELETE SET NULL,
 		created_date INTEGER DEFAULT 0,
 		updated_date INTEGER DEFAULT 0
 	);`)
+	db.Exec(`CREATE INDEX pages_title_version_index on pages(title, version DESC);`)
 	db.Exec(`CREATE INDEX pages_editgroupid_index on pages(editgroupid);`)
 	db.Exec(`CREATE INDEX pages_readgroupid_index on pages(readgroupid);`)
 
