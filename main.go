@@ -15,6 +15,7 @@ import (
 	"github.com/s-gv/femtowiki/models"
 	"net/http/fcgi"
 	"time"
+	"github.com/s-gv/femtowiki/views"
 )
 
 func getCreds() (string, string) {
@@ -126,6 +127,15 @@ func main() {
 	}
 
 	mux := http.NewServeMux()
+
+	mux.HandleFunc("/", views.IndexHandler)
+
+	mux.HandleFunc("/static/css/femtowiki.css", views.StyleHandler)
+
+	mux.HandleFunc("/static/js/femtowiki.js", views.ScriptHandler)
+
+	mux.HandleFunc("/favicon.ico", views.FaviconHandler)
+
 
 	if *fcgiMode {
 		fcgi.Serve(nil, mux)
