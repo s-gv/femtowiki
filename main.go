@@ -150,7 +150,7 @@ func main() {
 		IdleTimeout:  120 * time.Second,
 	}
 
-	log.Println("[INFO] Starting orangeforum at", *addr)
+	log.Println("[INFO] Starting femtowiki at", *addr)
 	err := srv.ListenAndServe()
 	if err != nil {
 		log.Panicf("[ERROR] %s\n", err)
