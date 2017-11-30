@@ -6,5 +6,5 @@ package templates
 
 const indexSrc = `
 {{ define "content" }}
-Femtowiki index page
+Femtowiki content
 {{ end }}`

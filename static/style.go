@@ -14,4 +14,24 @@ html, body {
 	margin: 0;
 	height: 100%;
 }
+.clearfix {
+	overflow: auto;
+	zoom: 1;
+}
+header {
+	padding: 10px;
+	text-align: center;
+}
+footer {
+	text-align: center;
+}
+nav {
+	float: left;
+	max-width: 180px;
+}
+article {
+	margin-left: 200px;
+}
+.container {
+}
 `
