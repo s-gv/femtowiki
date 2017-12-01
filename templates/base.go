@@ -17,20 +17,22 @@ const baseSrc = `<!DOCTYPE html>
 	{{ block "head" . }}{{ end }}
 </head>
 <body>
-	<header>
-		Home Download FAQ
-	</header>
-	<div class="container clearfix">
-		<nav>
-			<ul>
-				<li>London</li>
-				<li>New York</li>
-				<li>Bangalore</li>
-			</ul>
-		</nav>
-		<article>
-		{{ block "content" . }}{{ end }}
-		</article>
+	<div id="container">
+		<div id="content">
+			<header>
+				Home Download FAQ
+			</header>
+			<nav>
+				<ul>
+					<li>London</li>
+					<li>New York</li>
+					<li>Bangalore</li>
+				</ul>
+			</nav>
+			<article>
+			{{ block "content" . }}{{ end }}
+			</article>
+		</div>
 	</div>
 	<footer>
 		Privacy Terms Help
