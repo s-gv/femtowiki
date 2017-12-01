@@ -19,29 +19,29 @@ html, body, #container {
 	height: auto;
 	min-height: 100%;
 }
-#content {
+#main {
 	padding-bottom: 3em;
 }
 .clearfix {
 	overflow: auto;
 	zoom: 1;
 }
-header {
+#header {
 	padding: 10px;
 	text-align: center;
 }
-footer {
+#footer {
 	position: relative;
 	clear: both;
 	height: 3em;
 	margin-top: -3em;
 	text-align: center;
 }
-nav {
+#nav {
 	float: left;
 	max-width: 180px;
 }
-article {
+#content {
 	margin-left: 200px;
 }
 `
