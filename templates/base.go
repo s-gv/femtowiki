@@ -20,14 +20,9 @@ const baseSrc = `<!DOCTYPE html>
 	<div id="header">
 		Home Download FAQ
 	</div>
-	<div id="wrap">
-		<div id="container">
-			<div id="content">
-				{{ block "content" . }}{{ end }}
-			</div>
-			<div id="footer">
-				Privacy Terms Help
-			</div>
+	<div id="container">
+		<div id="content">
+			{{ block "content" . }}{{ end }}
 		</div>
 		<div id="nav">
 			<ul>
@@ -35,6 +30,9 @@ const baseSrc = `<!DOCTYPE html>
 				<li>New York</li>
 				<li>Bangalore</li>
 			</ul>
+		</div>
+		<div id="footer">
+			Privacy Terms Help
 		</div>
 	</div>
 	<script src="/static/js/femtowiki.js?v=010"></script>

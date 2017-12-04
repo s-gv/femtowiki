@@ -10,32 +10,42 @@ const StyleSrc = `
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 }
-.clearfix {
-	overflow: auto;
-	zoom: 1;
-}
 html, body {
 	margin: 0;
 	padding: 0;
 }
-#wrap {
+.clearfix {
+	overflow: auto;
+	zoom: 1;
+}
+#container {
 	position: relative;
 }
 #header {
+	text-align: right;
 	padding: 10px;
-	text-align: center;
+}
+#content {
+	padding: 10px;
+}
+#nav {
+	padding: 10px;
+}
+#footer {
+	padding: 10px;
 }
 @media screen and (min-width:600px) {
 	#nav {
 		position: absolute;
+		top: 0px;
 		width: 180px;
 	}
-	#container {
-		position: absolute;
-		margin-left: 200px;
-	}
 	#content {
+		margin-left: 200px;
 		min-height: 480px;
+	}
+	#footer {
+		margin-left: 200px;
 	}
 }
 `
