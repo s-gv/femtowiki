@@ -14,27 +14,65 @@ html, body {
 	margin: 0;
 	padding: 0;
 }
+body {
+	font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+	-webkit-font-smoothing: antialiased;
+	text-rendering: optimizeLegibility;
+	line-height: 1.58;
+	margin-bottom: 50px;
+	background-color: #f6f6f6;
+}
 .clearfix {
 	overflow: auto;
 	zoom: 1;
 }
+a {
+	text-decoration: none;
+}
+a:link {
+	color: #07C;
+}
+a:hover, a:active {
+	color: #3af;
+}
+a:visited {
+	color: #005999;
+}
 #container {
 	position: relative;
+	padding: 10px;
 }
 #header {
 	text-align: right;
+	padding: 18px;
+	background-color: #333333;
+	border-bottom: 5px #08C solid;
+	color: #FFFFFF;
+}
+#header .logo {
+	float: left;
+}
+#header a {
+	color: #FFFFFF;
+	padding: 0 10px;
+	font-size: 16px;
+	font-weight: bold;
+}
+#header a:link, #header a:visited, #header a:hover, #header a:active {
+	text-decoration: none;
+}
+#section-profile {
+	text-align: right;
 	padding: 10px;
 }
-#content {
-	padding: 10px;
-}
-#nav {
-	padding: 10px;
-}
-#footer {
-	padding: 10px;
+#section-profile a {
+	padding: 0 10px;
 }
 @media screen and (min-width:600px) {
+	#header a {
+		padding: 0 20px;
+		font-size: 18px;
+	}
 	#nav {
 		position: absolute;
 		top: 0px;

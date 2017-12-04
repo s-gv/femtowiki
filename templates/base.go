@@ -18,10 +18,11 @@ const baseSrc = `<!DOCTYPE html>
 </head>
 <body>
 	<div id="header">
-		Home Download FAQ
+		<div class="logo">Femtowiki</div> <a href="">Home</a> <a href="">Download</a> <a href="">FAQ</a>
 	</div>
 	<div id="container">
 		<div id="content">
+			<div id="section-profile"><a href="/signup">Signup</a> <a href="/login">Login</a></div>
 			{{ block "content" . }}{{ end }}
 		</div>
 		<div id="nav">
