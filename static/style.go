@@ -10,38 +10,32 @@ const StyleSrc = `
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 }
-html, body, #container {
-	height: 100%;
-	margin: 0;
-	padding: 0;
-}
-#container {
-	height: auto;
-	min-height: 100%;
-}
-#main {
-	padding-bottom: 3em;
-}
 .clearfix {
 	overflow: auto;
 	zoom: 1;
+}
+html, body {
+	margin: 0;
+	padding: 0;
+}
+#wrap {
+	position: relative;
 }
 #header {
 	padding: 10px;
 	text-align: center;
 }
-#footer {
-	position: relative;
-	clear: both;
-	height: 3em;
-	margin-top: -3em;
-	text-align: center;
-}
-#nav {
-	float: left;
-	max-width: 180px;
-}
-#content {
-	margin-left: 200px;
+@media screen and (min-width:600px) {
+	#nav {
+		position: absolute;
+		width: 180px;
+	}
+	#container {
+		position: absolute;
+		margin-left: 200px;
+	}
+	#content {
+		min-height: 480px;
+	}
 }
 `
