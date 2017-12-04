@@ -47,15 +47,14 @@ a:visited {
 	padding: 18px;
 	background-color: #333333;
 	border-bottom: 5px #08C solid;
-	color: #FFFFFF;
 }
 #header .logo {
 	float: left;
 }
 #header a {
 	color: #FFFFFF;
-	padding: 0 10px;
 	font-size: 16px;
+	padding: 0 10px;
 	font-weight: bold;
 }
 #header a:link, #header a:visited, #header a:hover, #header a:active {
@@ -63,7 +62,7 @@ a:visited {
 }
 #section-profile {
 	text-align: right;
-	padding: 10px;
+	padding: 10px 0px;
 }
 #section-profile a {
 	padding: 0 10px;
@@ -71,7 +70,6 @@ a:visited {
 @media screen and (min-width:600px) {
 	#header a {
 		padding: 0 20px;
-		font-size: 18px;
 	}
 	#nav {
 		position: absolute;

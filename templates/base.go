@@ -18,7 +18,7 @@ const baseSrc = `<!DOCTYPE html>
 </head>
 <body>
 	<div id="header">
-		<div class="logo">Femtowiki</div> <a href="">Home</a> <a href="">Download</a> <a href="">FAQ</a>
+		<div class="logo"><a href="/">Femtowiki</a></div> <a href="">Home</a> <a href="">Download</a> <a href="">FAQ</a>
 	</div>
 	<div id="container">
 		<div id="content">
