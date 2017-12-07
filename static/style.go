@@ -40,7 +40,6 @@ a:visited {
 }
 #container {
 	position: relative;
-	padding: 10px;
 }
 #header {
 	text-align: right;
@@ -63,30 +62,39 @@ a:visited {
 #section-profile {
 	text-align: right;
 	padding: 10px 0px;
+	font-size: 14px;
+	margin-bottom: 16px;
 }
 #section-profile a {
 	padding: 0 10px;
+}
+#footer {
+	font-size: 12px;
+}
+#footer a {
+	margin: 0 4px;
 }
 @media screen and (min-width:600px) {
 	#header a {
 		padding: 0 20px;
 	}
-	#nav {
-		position: absolute;
-		top: 0px;
-		width: 200px;
-	}
-	#content {
-		margin-left: 220px;
-		min-height: 480px;
-	}
-	#footer {
+	#content, #footer {
 		margin-left: 220px;
 	}
 }
 
+/* navbar to the left */
 #nav {
 	margin: 16px 0;
+	font-size: 14px;
+}
+@media screen and (min-width:600px) {
+	#nav {
+		position: absolute;
+		top: 0px;
+		width: 200px;
+		margin: 16px 12px;
+	}
 }
 .nav-section {
 	padding: 8px 16px;
@@ -102,6 +110,36 @@ a:visited {
 .nav-section ul {
 	padding: 0;
 	list-style-type: none;
+}
+
+/* search section */
+#section-search {
+	font-size: 14px;
+	padding: 4px 0;
+}
+#section-search span.right {
+	float: right;
+	position: relative;
+	top: -12px;
+}
+#section-search span {
+	padding: 8px 12px;
+	border: 1px none #ccc;
+}
+#section-search span.active {
+	background-color: white;
+	border-style: solid;
+	border-bottom: none;
+}
+
+
+/* meat of the page */
+#meat {
+	min-height: 480px;
+	margin-bottom: 16px;
+	padding: 16px;
+	background-color: white;
+	border: 1px solid #ccc;
 }
 
 `

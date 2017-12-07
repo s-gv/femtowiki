@@ -23,7 +23,15 @@ const baseSrc = `<!DOCTYPE html>
 	<div id="container">
 		<div id="content">
 			<div id="section-profile"><a href="/signup">Signup</a> <a href="/login">Login</a></div>
-			{{ block "content" . }}{{ end }}
+			<div id="section-search">
+				<span class="active"><a href="">Main</a></span>
+				<span><a href="">Discussion</a></span>
+				<span class="right"><a href="">Source</a></span>
+				<span class="active right"><a href="">Read</a></span>
+			</div>
+			<div id="meat">
+				{{ block "content" . }}{{ end }}
+			</div>
 		</div>
 		<div id="nav">
 			<div class="nav-section">
@@ -53,7 +61,7 @@ const baseSrc = `<!DOCTYPE html>
 			</div>
 		</div>
 		<div id="footer">
-			Privacy Terms Help
+			<a href="">Privacy</a> <a href="">Terms</a> <a href="">Help</a>
 		</div>
 	</div>
 	<script src="/static/js/femtowiki.js?v=010"></script>
