@@ -105,7 +105,10 @@ a:visited {
 	font-size: 1em;
 }
 .nav-section hr {
-
+	height: 1px;
+	color: #ddd;
+	background-color: #ddd;
+	border: none;
 }
 .nav-section ul {
 	padding: 0;
