@@ -74,14 +74,34 @@ a:visited {
 	#nav {
 		position: absolute;
 		top: 0px;
-		width: 180px;
+		width: 200px;
 	}
 	#content {
-		margin-left: 200px;
+		margin-left: 220px;
 		min-height: 480px;
 	}
 	#footer {
-		margin-left: 200px;
+		margin-left: 220px;
 	}
 }
+
+#nav {
+	margin: 16px 0;
+}
+.nav-section {
+	padding: 8px 16px;
+}
+.nav-section h3 {
+	margin: 0;
+	font-weight: normal;
+	font-size: 1em;
+}
+.nav-section hr {
+
+}
+.nav-section ul {
+	padding: 0;
+	list-style-type: none;
+}
+
 `

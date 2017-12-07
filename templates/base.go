@@ -26,11 +26,31 @@ const baseSrc = `<!DOCTYPE html>
 			{{ block "content" . }}{{ end }}
 		</div>
 		<div id="nav">
-			<ul>
-				<li>London</li>
-				<li>New York</li>
-				<li>Bangalore</li>
-			</ul>
+			<div class="nav-section">
+				<ul>
+					<li><a href="">Home</a></li>
+					<li><a href="">Download</a></li>
+					<li><a href="">FAQ</a></li>
+				</ul>
+			</div>
+			<div class="nav-section">
+				<h3>Cities</h3>
+				<hr>
+				<ul>
+					<li><a href="">London</a></li>
+					<li><a href="">New York</a></li>
+					<li><a href="">Bangalore</a></li>
+				</ul>
+			</div>
+			<div class="nav-section">
+				<h3>Languages</h3>
+				<hr>
+				<ul>
+					<li><a href="">English</a></li>
+					<li><a href="">Hindi</a></li>
+					<li><a href="">Kannada</a></li>
+				</ul>
+			</div>
 		</div>
 		<div id="footer">
 			Privacy Terms Help
