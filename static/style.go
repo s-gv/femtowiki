@@ -109,10 +109,13 @@ a:visited {
 	color: #ddd;
 	background-color: #ddd;
 	border: none;
+	margin: 2px 0;
 }
 .nav-section ul {
 	padding: 0;
 	list-style-type: none;
+	margin-top: 6px;
+	margin-bottom: 12px;
 }
 
 /* search section */
