@@ -26,7 +26,7 @@ const baseSrc = `<!DOCTYPE html>
 			<div id="section-tabs">
 				<div id="section-search">
 					<form method="GET" action="">
-						<input type="text" name="query" placeholder="Search">
+						<input type="text" name="query" placeholder="Search Femtowiki">
 						<input type="submit" value="Search">
 					</form>
 				</div>

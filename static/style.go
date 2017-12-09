@@ -38,6 +38,17 @@ a:hover, a:active {
 a:visited {
 	color: #005999;
 }
+input[type="text"] {
+	padding: 2px;
+	border: 1px solid #ccc;
+}
+input[type="submit"] {
+	padding: 1px 6px;
+	border: 2px solid #08c;
+	background-color: #08c;
+	color: #fff;
+	border-radius: 4px;
+}
 #container {
 	position: relative;
 }
@@ -122,15 +133,23 @@ a:visited {
 #section-tabs {
 	font-size: 14px;
 	padding: 4px 0;
+	position: relative;
+	bottom: -1px;
 }
 #section-search {
 	margin-bottom: 12px;
 	margin-left: 4px;
 	margin-right: 4px;
 }
-@media screen and (min-width:600px) {
+#section-search input[type="text"] {
+	width: 90%;
+}
+@media screen and (min-width:800px) {
 	#section-search {
 		float: right;
+	}
+	#section-search input[type="text"] {
+		width: auto;
 	}
 }
 #section-tabs-right {
