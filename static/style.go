@@ -119,25 +119,34 @@ a:visited {
 }
 
 /* search section */
-#section-search {
+#section-tabs {
 	font-size: 14px;
 	padding: 4px 0;
 }
-#section-search span.right {
-	float: right;
-	position: relative;
-	top: -12px;
+#section-search {
+	margin-bottom: 12px;
+	margin-left: 4px;
+	margin-right: 4px;
 }
-#section-search span {
+@media screen and (min-width:600px) {
+	#section-search {
+		float: right;
+	}
+}
+#section-tabs-right {
+	float: right;
+}
+#section-tabs-left {
+}
+#section-tabs span {
 	padding: 8px 12px;
 	border: 1px none #ccc;
 }
-#section-search span.active {
+#section-tabs span.active {
 	background-color: white;
 	border-style: solid;
 	border-bottom: none;
 }
-
 
 /* meat of the page */
 #meat {
