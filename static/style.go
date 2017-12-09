@@ -142,13 +142,16 @@ input[type="submit"] {
 	margin-right: 4px;
 }
 #section-search input[type="text"] {
-	width: 90%;
+	width: 75%;
+}
+#section-search input[type="submit"] {
+	width: 22%;
 }
 @media screen and (min-width:800px) {
 	#section-search {
 		float: right;
 	}
-	#section-search input[type="text"] {
+	#section-search input[type="text"], #section-search input[type="submit"] {
 		width: auto;
 	}
 }
