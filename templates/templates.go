@@ -14,7 +14,16 @@ var tmpls = make(map[string]*template.Template)
 
 func init() {
 	tmpls["index.html"] = template.Must(template.New("base").Parse(baseSrc))
-	template.Must(tmpls["index.html"].New("adminindex").Parse(indexSrc))
+	template.Must(tmpls["index.html"].New("index").Parse(indexSrc))
+
+	tmpls["login.html"] = template.Must(template.New("base").Parse(baseSrc))
+	template.Must(tmpls["login.html"].New("login").Parse(loginSrc))
+
+	tmpls["signup.html"] = template.Must(template.New("base").Parse(baseSrc))
+	template.Must(tmpls["signup.html"].New("signup").Parse(signupSrc))
+
+	tmpls["forgotpass.html"] = template.Must(template.New("base").Parse(baseSrc))
+	template.Must(tmpls["forgotpass.html"].New("forgotpass").Parse(forgotpassSrc))
 }
 
 func Render(wr io.Writer, template string, data interface{}) {

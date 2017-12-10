@@ -38,17 +38,6 @@ a:hover, a:active {
 a:visited {
 	color: #005999;
 }
-input[type="text"] {
-	padding: 2px;
-	border: 1px solid #ccc;
-}
-input[type="submit"] {
-	padding: 1px 6px;
-	border: 2px solid #08c;
-	background-color: #08c;
-	color: #fff;
-	border-radius: 4px;
-}
 #container {
 	position: relative;
 }
@@ -142,6 +131,17 @@ input[type="submit"] {
 	margin-right: 4px;
 }
 #section-search input[type="text"] {
+	padding: 2px;
+	border: 1px solid #ccc;
+}
+#section-search input[type="submit"] {
+	padding: 1px 6px;
+	border: 2px solid #08c;
+	background-color: #08c;
+	color: #fff;
+	border-radius: 4px;
+}
+#section-search input[type="text"] {
 	width: 75%;
 }
 #section-search input[type="submit"] {
@@ -179,4 +179,36 @@ input[type="submit"] {
 	border: 1px solid #ccc;
 }
 
+/* forms */
+.form-container {
+	padding: 20px 8px;
+	width: 100%;
+}
+@media screen and (min-width:800px) {
+	.form-container {
+		width: 360px;
+	}
+}
+.form-group {
+	margin: 8px 0px;
+}
+.form-group a, .form-group span {
+	font-size: 14px;
+}
+input[type="text"].form-control, input[type="password"].form-control {
+	padding: 5px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	width: 100%;
+}
+.btn {
+	padding: 6px 12px;
+	border-radius: 4px;
+	border: none;
+	width: 100%;
+}
+.btn-default {
+	background-color: #08c;
+	color: #fff;
+}
 `

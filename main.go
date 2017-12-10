@@ -136,6 +136,10 @@ func main() {
 
 	mux.HandleFunc("/favicon.ico", views.FaviconHandler)
 
+	mux.HandleFunc("/login", views.LoginHandler)
+	mux.HandleFunc("/signup", views.SignupHandler)
+	mux.HandleFunc("/forgotpass", views.ForgotpassHandler)
+
 
 	if *fcgiMode {
 		fcgi.Serve(nil, mux)
