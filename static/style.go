@@ -135,11 +135,7 @@ a:visited {
 	border: 1px solid #ccc;
 }
 #section-search input[type="submit"] {
-	padding: 1px 6px;
-	border: 2px solid #08c;
-	background-color: #08c;
-	color: #fff;
-	border-radius: 4px;
+	padding: 3px 8px;
 }
 #section-search input[type="text"] {
 	width: 75%;
@@ -195,11 +191,15 @@ a:visited {
 .form-group a, .form-group span {
 	font-size: 14px;
 }
-input[type="text"].form-control, input[type="password"].form-control {
+input[type="text"].form-control, input[type="password"].form-control, input[type="email"].form-control {
 	padding: 5px;
 	border: 1px solid #ccc;
 	border-radius: 4px;
 	width: 100%;
+}
+textarea:focus, input:focus{
+	outline: #0099E6 auto 1px;
+	outline-offset: -2px;
 }
 .btn {
 	padding: 6px 12px;
@@ -210,5 +210,13 @@ input[type="text"].form-control, input[type="password"].form-control {
 .btn-default {
 	background-color: #08c;
 	color: #fff;
+}
+.btn-default:hover {
+	background-color: #0099E6;
+	cursor: pointer;
+}
+.btn-default:active {
+	background-color: #006699;
+	cursor: pointer;
 }
 `

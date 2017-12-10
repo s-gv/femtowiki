@@ -10,7 +10,7 @@ const indexSrc = `
 	<div id="section-search">
 		<form method="GET" action="">
 			<input type="text" name="query" placeholder="Search Femtowiki">
-			<input type="submit" value="Search">
+			<input class="btn btn-default" type="submit" value="Search">
 		</form>
 	</div>
 	<div id="section-tabs-right">
