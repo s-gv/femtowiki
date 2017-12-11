@@ -226,7 +226,7 @@ input[type="text"].form-control, input[type="password"].form-control, input[type
 	border-radius: 4px;
 	width: 100%;
 }
-textarea:focus, input:focus{
+textarea:focus, input[type="text"]:focus, input[type="password"]:focus, input[type="email"]:focus {
 	outline: #0099E6 auto 1px;
 	outline-offset: -2px;
 }
