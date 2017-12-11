@@ -43,7 +43,7 @@ a:visited {
 }
 #header {
 	text-align: right;
-	padding: 18px;
+	padding: 18px 6px;
 	background-color: #333333;
 	border-bottom: 5px #08C solid;
 }
@@ -74,7 +74,7 @@ a:visited {
 #footer a {
 	margin: 0 4px;
 }
-@media screen and (min-width:600px) {
+@media screen and (min-width:800px) {
 	#header a {
 		padding: 0 20px;
 	}
@@ -88,7 +88,7 @@ a:visited {
 	margin: 16px 0;
 	font-size: 14px;
 }
-@media screen and (min-width:600px) {
+@media screen and (min-width:800px) {
 	#nav {
 		position: absolute;
 		top: 0px;
@@ -124,6 +124,7 @@ a:visited {
 	padding: 4px 0;
 	position: relative;
 	bottom: -1px;
+	z-index: 10;
 }
 #section-search {
 	margin-bottom: 12px;
@@ -168,11 +169,34 @@ a:visited {
 
 /* meat of the page */
 #meat {
+	position: relative;
 	min-height: 480px;
 	margin-bottom: 16px;
 	padding: 16px;
 	background-color: white;
 	border: 1px solid #ccc;
+}
+@media screen and (min-width:800px) {
+	#meat {
+		padding: 16px 24px;
+	}
+}
+#meat h1, #meat h2 {
+	border-style: none none solid none;
+	border-color: #ccc;
+	border-width: 1px;
+}
+
+/* table of contents box */
+.toc {
+	background-color: #f6f6f6;
+	width: 100%;
+	border: 1px solid #ccc;
+}
+@media screen and (min-width:800px) {
+	.toc {
+		width: 360px;
+	}
 }
 
 /* forms */
