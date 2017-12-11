@@ -182,6 +182,8 @@ a:visited {
 	}
 }
 #meat h1, #meat h2 {
+	font-family: 'Linux Libertine', 'Georgia', 'Times', serif;
+	font-weight: normal;
 	border-style: none none solid none;
 	border-color: #ccc;
 	border-width: 1px;
