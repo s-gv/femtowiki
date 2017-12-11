@@ -148,7 +148,10 @@ a:visited {
 	#section-search {
 		float: right;
 	}
-	#section-search input[type="text"], #section-search input[type="submit"] {
+	#section-search input[type="text"] {
+		width: 240px;
+	}
+	#section-search input[type="submit"] {
 		width: auto;
 	}
 }
