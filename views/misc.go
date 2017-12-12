@@ -17,6 +17,7 @@ var IndexHandler = UA(func(w http.ResponseWriter, r *http.Request, ctx Context) 
 		return
 	}
 	templates.Render(w, "index.html", map[string]interface{}{
+		"IsEditMode": true,
 	})
 })
 

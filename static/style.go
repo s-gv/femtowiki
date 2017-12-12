@@ -191,6 +191,14 @@ a:visited {
 	border-color: #ccc;
 	border-width: 1px;
 }
+#meat textarea {
+	width: 100%;
+}
+@media screen and (min-width:800px) {
+	#meat input[type="submit"] {
+		width: auto;
+	}
+}
 
 /* table of contents box */
 .toc {
