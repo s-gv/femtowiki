@@ -256,4 +256,9 @@ textarea:focus, input[type="text"]:focus, input[type="password"]:focus, input[ty
 	background-color: #006699;
 	cursor: pointer;
 }
+
+/* flash message */
+.flash {
+	color: red;
+}
 `

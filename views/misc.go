@@ -11,12 +11,13 @@ import (
 	"github.com/s-gv/femtowiki/static"
 )
 
-var IndexHandler = UA(func(w http.ResponseWriter, r *http.Request, ctx Context) {
+var IndexHandler = UA(func(w http.ResponseWriter, r *http.Request, ctx *Context) {
 	if r.URL.Path != "/" {
 		ErrNotFoundHandler(w, r)
 		return
 	}
 	templates.Render(w, "index.html", map[string]interface{}{
+		"Context": ctx,
 		"IsEditMode": true,
 	})
 })

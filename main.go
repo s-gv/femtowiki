@@ -102,7 +102,7 @@ func main() {
 			email = args[2]
 		}
 		if username != "" && passwd != "" {
-			if err := models.CreateUser(username, passwd, email); err != nil {
+			if err := models.CreateUser(username, passwd, email, false); err != nil {
 				fmt.Printf("Error creating user: %s\n", err)
 			}
 		} else {
@@ -139,6 +139,7 @@ func main() {
 	mux.HandleFunc("/login", views.LoginHandler)
 	mux.HandleFunc("/signup", views.SignupHandler)
 	mux.HandleFunc("/forgotpass", views.ForgotpassHandler)
+	mux.HandleFunc("/logout", views.LogoutHandler)
 
 
 	if *fcgiMode {

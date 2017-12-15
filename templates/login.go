@@ -9,6 +9,7 @@ const loginSrc = `
 <div class="form-container">
 	<h3>Login to Femtowiki</h3>
 	<form action="/login" method="POST">
+		<input type="hidden" name="next" value="{{ .next }}">
 		<div class="form-group">
 			<input type="text" class="form-control" name="username" placeholder="Username">
 		</div>
@@ -18,6 +19,11 @@ const loginSrc = `
 		<div class="form-group">
 			<a href="/forgotpass">Forgot password?</a>
 		</div>
+		{{ if .ctx.FlashMsg }}
+		<div class="form-group">
+			<span class="flash">{{ .ctx.FlashMsg }}</span>
+		</div>
+		{{ end }}
 		<input type="submit" class="btn btn-default" value="Login">
 	</form>
 </div>

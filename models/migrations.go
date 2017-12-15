@@ -54,6 +54,7 @@ func Migration1() {
 	db.Exec(`CREATE TABLE sessions(
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		sessionid VARCHAR(250) DEFAULT '',
+		csrftoken VARCHAR(250) DEFAULT '',
 		userid INTEGER REFERENCES users(id) ON DELETE CASCADE,
 		msg VARCHAR(250) DEFAULT '',
 		created_date INTEGER DEFAULT 0,

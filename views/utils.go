@@ -13,14 +13,6 @@ import (
 	"encoding/base64"
 )
 
-type Context struct {
-	CSRF        string
-	Msg         string
-	UserName    string
-	IsUserValid bool
-	IsAdmin     bool
-}
-
 func ErrServerHandler(w http.ResponseWriter, r *http.Request) {
 	if r := recover(); r != nil {
 		log.Printf("[INFO] Recovered from panic: %s\n[INFO] Debug stack: %s\n", r, debug.Stack())
@@ -36,23 +28,27 @@ func ErrForbiddenHandler(w http.ResponseWriter, r *http.Request) {
 	http.Error(w, "403 Forbidden", http.StatusForbidden)
 }
 
-func UA(handler func(w http.ResponseWriter, r *http.Request, ctx Context)) func(w http.ResponseWriter, r *http.Request) {
+func UA(handler func(w http.ResponseWriter, r *http.Request, ctx *Context)) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer ErrServerHandler(w, r)
-		ctx := Context{} // TODO: Fill up context with data from DB
+		sessionID := ""
+		if cookie, err := r.Cookie("sessionid"); err == nil {
+			sessionID = cookie.Value
+		}
+		ctx := ReadContext(sessionID)
 		//log.Printf("[INFO] Request: %s\n", r.URL)
-		handler(w, r, ctx)
+		handler(w, r, &ctx)
 	}
 }
 
-func A(handler func(w http.ResponseWriter, r *http.Request, ctx Context)) func(w http.ResponseWriter, r *http.Request) {
+func A(handler func(w http.ResponseWriter, r *http.Request, ctx *Context)) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer ErrServerHandler(w, r)
-		ctx := Context{} // TODO: Get context from session
-		if r.Method == "POST" && r.PostFormValue("csrf") != ctx.CSRF {
-			ErrForbiddenHandler(w, r)
-			return
+		sessionID := ""
+		if cookie, err := r.Cookie("sessionid"); err == nil {
+			sessionID = cookie.Value
 		}
+		ctx := ReadContext(sessionID)
 		if !ctx.IsUserValid {
 			redirectURL := r.URL.Path
 			if r.URL.RawQuery != "" {
@@ -61,8 +57,12 @@ func A(handler func(w http.ResponseWriter, r *http.Request, ctx Context)) func(w
 			http.Redirect(w, r, "/login?next="+url.QueryEscape(redirectURL), http.StatusSeeOther)
 			return
 		}
+		if r.Method == "POST" && ctx.ValidateCSRFToken(r.PostFormValue("csrf")) != nil {
+			ErrForbiddenHandler(w, r)
+			return
+		}
 		//log.Printf("[INFO] Request: %s\n", r.URL)
-		handler(w, r, ctx)
+		handler(w, r, &ctx)
 	}
 }
 
