@@ -21,6 +21,11 @@ const signupSrc = `
 		<div class="form-group">
 			<span>Already have an account?</span> <a href="/login">Signin</a>
 		</div>
+		{{ if .ctx.FlashMsg }}
+		<div class="form-group">
+			<span class="flash">{{ .ctx.FlashMsg }}</span>
+		</div>
+		{{ end }}
 		<input type="submit" class="btn btn-default" value="Signup">
 	</form>
 </div>

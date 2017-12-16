@@ -4,23 +4,24 @@
 
 package templates
 
-const forgotpassSrc = `
+const resetpassSrc = `
 {{ define "content" }}
 <div class="form-container">
-	<h3>Forgot password</h3>
-	<form action="/forgotpass" method="POST">
+	<h3>Reset password</h3>
+	<form action="/resetpass" method="POST">
+		<input type="hidden" name="token" value="{{ .ResetToken }}">
 		<div class="form-group">
-			<input type="text" class="form-control" name="username" placeholder="Username">
+			<input type="password" class="form-control" name="passwd" placeholder="New password">
 		</div>
 		<div class="form-group">
-			<span>Remember your password?</span> <a href="/login">Signin</a>
+			<input type="password" class="form-control" name="passwd2" placeholder="Confirm new password">
 		</div>
 		{{ if .ctx.FlashMsg }}
 		<div class="form-group">
 			<span class="flash">{{ .ctx.FlashMsg }}</span>
 		</div>
 		{{ end }}
-		<input type="submit" class="btn btn-default" value="Email password reset link">
+		<input type="submit" class="btn btn-default" value="Reset Password">
 	</form>
 </div>
 {{ end }}

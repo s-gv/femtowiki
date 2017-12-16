@@ -138,7 +138,9 @@ func main() {
 
 	mux.HandleFunc("/login", views.LoginHandler)
 	mux.HandleFunc("/signup", views.SignupHandler)
+	mux.HandleFunc("/changepass", views.ChangepassHandler)
 	mux.HandleFunc("/forgotpass", views.ForgotpassHandler)
+	mux.HandleFunc("/resetpass", views.ResetpassHandler)
 	mux.HandleFunc("/logout", views.LogoutHandler)
 
 

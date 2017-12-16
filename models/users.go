@@ -11,6 +11,7 @@ import (
 	"time"
 	"github.com/s-gv/femtowiki/models/db"
 	"errors"
+	"log"
 )
 
 func CreateSuperUser(username string, passwd string) error {
@@ -33,6 +34,40 @@ func CreateUser(username string, passwd string, email string, isSuperUser bool) 
 	return nil
 }
 
+func ValidatePasswd(passwd string) error {
+	if len(passwd) < 8 || len(passwd) > 64 {
+		return errors.New("Password must have 8-64 characters")
+	}
+	return nil
+}
+
+func VerifyPasswd(username string, passwd string) error {
+	r := db.QueryRow(`SELECT passwdhash FROM users WHERE username=?;`, username)
+	var passwdHashStr string
+	if err := r.Scan(&passwdHashStr); err != nil {
+		return errors.New("Incorrect username or password")
+	}
+	passwdHash, err := hex.DecodeString(passwdHashStr)
+	if err != nil {
+		log.Panicf("[ERROR] Error in converting password hash from hex to byte slice: %s\n", err)
+	}
+	if err := bcrypt.CompareHashAndPassword(passwdHash, []byte(passwd)); err != nil {
+		return errors.New("Incorrect username or password")
+	}
+	return nil
+}
+
 func UpdateUserPasswd(username string, passwd string) error {
+	if passwdHash, err := bcrypt.GenerateFromPassword([]byte(passwd), bcrypt.DefaultCost); err == nil {
+		r := db.QueryRow(`SELECT username FROM users WHERE username=?;`, username)
+		var tmp string
+		if err := r.Scan(&tmp); err == nil {
+			db.Exec(`UPDATE users SET passwdhash=?, updated_date=? WHERE username=?;`, hex.EncodeToString(passwdHash), time.Now().Unix(), username)
+		} else {
+			return errors.New("User not found.")
+		}
+	} else {
+		return err
+	}
 	return nil
 }

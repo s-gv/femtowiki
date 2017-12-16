@@ -20,6 +20,7 @@ type Context struct {
 	IsAdmin     bool
 	CSRFToken   string
 	FlashMsg    string
+	WikiName	string
 }
 
 const maxSessionLife = 200*time.Hour
@@ -45,6 +46,7 @@ func ReadContext(sessionID string) Context {
 				ctx.UserName = username
 				ctx.IsAdmin = isAdmin
 				ctx.IsUserValid = true
+				ctx.CSRFToken = csrftoken
 			} else {
 				// Session expired
 				//log.Printf("[INFO] Attempted to use expired session (id: %s)\n", sessionID)

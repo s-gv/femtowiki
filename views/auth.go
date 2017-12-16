@@ -11,6 +11,8 @@ import (
 	"fmt"
 	"time"
 	"html/template"
+	"github.com/s-gv/femtowiki/models/db"
+	"github.com/s-gv/femtowiki/models"
 )
 
 var LoginHandler = UA(func(w http.ResponseWriter, r *http.Request, ctx *Context) {
@@ -49,8 +51,101 @@ var SignupHandler = UA(func(w http.ResponseWriter, r *http.Request, ctx *Context
 	})
 })
 
+var ChangepassHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *Context) {
+	if r.Method == "POST" {
+		oldPasswd := r.PostFormValue("oldpasswd")
+		if err := models.VerifyPasswd(ctx.UserName, oldPasswd); err != nil {
+			ctx.SetFlashMsg(err.Error())
+			http.Redirect(w, r, "/changepass", http.StatusSeeOther)
+			return
+		}
+
+		newPasswd := r.PostFormValue("passwd")
+		newPasswd2 := r.PostFormValue("passwd2")
+		if err := models.ValidatePasswd(newPasswd); err != nil {
+			ctx.SetFlashMsg(err.Error())
+			http.Redirect(w, r, "/changepass", http.StatusSeeOther)
+			return
+		}
+		if newPasswd != newPasswd2 {
+			ctx.SetFlashMsg("New passwords do not match")
+			http.Redirect(w, r, "/changepass", http.StatusSeeOther)
+			return
+		}
+
+		if err := models.UpdateUserPasswd(ctx.UserName, newPasswd); err != nil {
+			ctx.SetFlashMsg(err.Error())
+			http.Redirect(w, r, "/changepass", http.StatusSeeOther)
+			return
+		}
+
+		ctx.SetFlashMsg("Password changed successfully")
+		http.Redirect(w, r, "/changepass", http.StatusSeeOther)
+		return
+	}
+	templates.Render(w, "changepass.html", map[string]interface{}{
+		"ctx": ctx,
+	})
+})
+
 var ForgotpassHandler = UA(func(w http.ResponseWriter, r *http.Request, ctx *Context) {
+	if r.Method == "POST" {
+		username := r.PostFormValue("username")
+		row := db.QueryRow(`SELECT email FROM users WHERE username=?;`, username)
+		var email string
+		if err := row.Scan(&email); err == nil {
+			resetToken := randSeq(40)
+			db.Exec(`UPDATE users SET reset_token=?, reset_token_date=? WHERE username=?;`, resetToken, int64(time.Now().Unix()), username)
+
+			resetLink := "https://" + r.Host + "/resetpass?r=" + resetToken
+			sub := ctx.WikiName + " Password Recovery"
+			msg := "Someone (hopefully you) requested we reset your password at " + ctx.WikiName + ".\r\n" +
+				"If you want to change it, visit "+resetLink+"\r\n\r\nIf not, just ignore this message."
+
+			SendMail(email, sub, msg, ctx)
+			ctx.FlashMsg = "Password reset link has been sent to your email"
+		} else {
+			ctx.FlashMsg = "User not found"
+		}
+	}
 	templates.Render(w, "forgotpass.html", map[string]interface{}{
+		"ctx": ctx,
+	})
+})
+
+var ResetpassHandler = UA(func(w http.ResponseWriter, r *http.Request, ctx *Context) {
+	resetToken := r.FormValue("token")
+	if r.Method == "POST" {
+		row := db.QueryRow(`SELECT username, reset_token, reset_token_date FROM users WHERE reset_token=?;`, resetToken)
+		var username string
+		var rDate int64
+		if err := row.Scan(&username, &rDate); err != nil {
+			ErrNotFoundHandler(w, r)
+			return
+		}
+		resetTokenDate := time.Unix(rDate, 0)
+		if resetTokenDate.Before(time.Now().Add(-100*time.Hour)) {
+			ErrNotFoundHandler(w, r)
+			return
+		}
+
+		passwd := r.PostFormValue("passwd")
+		passwd2 := r.PostFormValue("passwd2")
+		if passwd == passwd2 {
+			if err := models.ValidatePasswd(passwd); err == nil {
+				models.UpdateUserPasswd(username, passwd)
+				http.Redirect(w, r, "/login", http.StatusSeeOther)
+				return
+			} else {
+				ctx.FlashMsg = err.Error()
+			}
+		} else {
+			ctx.FlashMsg = "New passwords do not match"
+		}
+	}
+	templates.Render(w, "resetpass.html", map[string]interface{}{
+		"ctx": ctx,
+		"ResetToken": resetToken,
 	})
 })
 
