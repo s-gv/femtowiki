@@ -12,17 +12,29 @@ const baseSrc = `<!DOCTYPE html>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" type="text/css" href="/static/css/femtowiki.css?v=010">
 	<title>
-		Femtowiki
+		{{ .ctx.Config.WikiName }}
 	</title>
 	{{ block "head" . }}{{ end }}
 </head>
 <body>
 	<div id="header">
-		<div class="logo"><a href="/">Femtowiki</a></div> <a href="">Home</a> <a href="">Download</a> <a href="">FAQ</a>
+		<div class="logo"><a href="/">{{ .ctx.Config.WikiName }}</a></div> <a href="">Home</a> <a href="">Download</a> <a href="">FAQ</a>
 	</div>
 	<div id="container">
 		<div id="content">
-			<div id="section-profile"><a href="/signup">Signup</a> <a href="/login">Login</a></div>
+			{{ if .ctx.IsUserValid }}
+			<div id="section-profile">
+				<span class="section-profile-link">
+					<a href="/profile?user={{ .ctx.UserName }}">{{ .ctx.UserName }}</a>
+					{{ if .ctx.IsAdmin }}(<a href="/admin">admin</a>){{ end }}
+				</span>
+				<span class="section-profile-link"><a href="/logout">Logout</a></span>
+			</div>
+			{{ else }}
+			<div id="section-profile">
+				<span class="section-profile-link"><a href="/signup">Signup</a></span>
+				<span class="section-profile-link"><a href="/login">Login</a></div></span>
+			{{ end }}
 			{{ block "content" . }}{{ end }}
 		</div>
 		<div id="nav">

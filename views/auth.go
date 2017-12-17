@@ -47,7 +47,38 @@ var LoginHandler = UA(func(w http.ResponseWriter, r *http.Request, ctx *Context)
 })
 
 var SignupHandler = UA(func(w http.ResponseWriter, r *http.Request, ctx *Context) {
+	if r.Method == "POST" {
+		username := r.PostFormValue("username")
+		passwd := r.PostFormValue("passwd")
+		passwd2 := r.PostFormValue("passwd2")
+
+		if err := models.ValidateUsername(username); err == nil {
+			if passwd == passwd2 {
+				if err := models.ValidatePasswd(passwd); err == nil {
+					if err := models.CreateUser(username, passwd, "", false); err == nil {
+						if err := ctx.Authenticate(username, passwd); err == nil {
+							http.SetCookie(w, &http.Cookie{Name: "sessionid", Path: "/", Value: ctx.SessionID, HttpOnly: true})
+							http.Redirect(w, r, "/", http.StatusSeeOther)
+							return
+						} else {
+							ctx.FlashMsg = err.Error()
+						}
+						return
+					} else {
+						ctx.FlashMsg = err.Error()
+					}
+				} else {
+					ctx.FlashMsg = err.Error()
+				}
+			} else {
+				ctx.FlashMsg = "Passwords don't match"
+			}
+		} else {
+			ctx.FlashMsg = err.Error()
+		}
+	}
 	templates.Render(w, "signup.html", map[string]interface{}{
+		"ctx": ctx,
 	})
 })
 
@@ -98,11 +129,11 @@ var ForgotpassHandler = UA(func(w http.ResponseWriter, r *http.Request, ctx *Con
 			db.Exec(`UPDATE users SET reset_token=?, reset_token_date=? WHERE username=?;`, resetToken, int64(time.Now().Unix()), username)
 
 			resetLink := "https://" + r.Host + "/resetpass?r=" + resetToken
-			sub := ctx.WikiName + " Password Recovery"
-			msg := "Someone (hopefully you) requested we reset your password at " + ctx.WikiName + ".\r\n" +
+			sub := ctx.Config.WikiName + " Password Recovery"
+			msg := "Someone (hopefully you) requested we reset your password at " + ctx.Config.WikiName + ".\r\n" +
 				"If you want to change it, visit "+resetLink+"\r\n\r\nIf not, just ignore this message."
 
-			SendMail(email, sub, msg, ctx)
+			SendMail(email, sub, msg, ctx.Config)
 			ctx.FlashMsg = "Password reset link has been sent to your email"
 		} else {
 			ctx.FlashMsg = "User not found"

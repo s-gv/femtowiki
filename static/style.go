@@ -61,11 +61,11 @@ a:visited {
 }
 #section-profile {
 	text-align: right;
-	padding: 10px 0px;
+	padding: 10px 10px;
 	font-size: 14px;
 	margin-bottom: 16px;
 }
-#section-profile a {
+.section-profile-link {
 	padding: 0 10px;
 }
 #footer {

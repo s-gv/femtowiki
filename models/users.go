@@ -15,7 +15,7 @@ import (
 )
 
 func CreateSuperUser(username string, passwd string) error {
-	return CreateUser(username, passwd, "", false)
+	return CreateUser(username, passwd, "", true)
 }
 
 func CreateUser(username string, passwd string, email string, isSuperUser bool) error {
@@ -30,6 +30,18 @@ func CreateUser(username string, passwd string, email string, isSuperUser bool) 
 		}
 	} else {
 		return err
+	}
+	return nil
+}
+
+func ValidateUsername(username string) error {
+	if len(username) < 2 || len(username) > 32 {
+		return errors.New("Username should have 2-32 characters.")
+	}
+	for _, ch := range username {
+		if (ch < 'A' || ch > 'Z') && (ch < 'a' || ch > 'z') && (ch != '_') && (ch != '-') && (ch < '0' || ch > '9') {
+			return errors.New("Username may contain only characters, numbers, underscore, and hyphen.")
+		}
 	}
 	return nil
 }

@@ -11,6 +11,7 @@ import (
 	"net/url"
 	"crypto/rand"
 	"encoding/base64"
+	"net/smtp"
 )
 
 func ErrServerHandler(w http.ResponseWriter, r *http.Request) {
@@ -74,25 +75,20 @@ func randSeq(n int) string {
 	return base64.URLEncoding.EncodeToString(b)
 }
 
-func SendMail(to string, sub string, body string, ctx *Context) {
-	/*
+func SendMail(to string, sub string, body string, config WikiConfig) {
 	go func(to string, sub string, body string) {
-		smtpHost := models.Config(models.SMTPHost)
-		from := models.Config(models.DefaultFromMail)
-		if from != "" && smtpHost != "" {
-			smtpUser := models.Config(models.SMTPUser)
-			smtpPass := models.Config(models.SMTPPass)
-			auth := smtp.PlainAuth("", smtpUser, smtpPass, smtpHost)
-			msg := []byte("From: "+models.Config(models.ForumName)+"<"+from+">\r\n" +
+		if config.FromEmail != "" && config.SMTPHost != "" && config.SMTPPort != "" {
+			auth := smtp.PlainAuth("", config.SMTPUser, config.SMTPPasswd, config.SMTPHost)
+			msg := []byte("From: "+config.WikiName+"<"+config.FromEmail+">\r\n" +
 				"To: "+to+"\r\n" +
 				"Subject: "+sub+"\r\n" +
 				"\r\n" +
 				body+"\r\n")
 			var err error
-			if smtpUser != "" {
-				err = smtp.SendMail(models.Config(models.SMTPHost)+":"+models.Config(models.SMTPPort), auth, from, []string{to}, msg)
+			if config.SMTPUser != "" {
+				err = smtp.SendMail(config.SMTPHost+":"+config.SMTPPort, auth, config.FromEmail, []string{to}, msg)
 			} else {
-				err = smtp.SendMail(models.Config(models.SMTPHost)+":"+models.Config(models.SMTPPort), nil, from, []string{to}, msg)
+				err = smtp.SendMail(config.SMTPHost+":"+config.SMTPPort, nil, config.FromEmail, []string{to}, msg)
 			}
 
 			if err != nil {
@@ -103,5 +99,4 @@ func SendMail(to string, sub string, body string, ctx *Context) {
 		}
 
 	}(to, sub, body)
-	*/
 }

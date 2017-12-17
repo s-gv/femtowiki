@@ -11,6 +11,8 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"github.com/s-gv/femtowiki/models/db"
 	"errors"
+	"github.com/s-gv/femtowiki/models"
+	"encoding/json"
 )
 
 type Context struct {
@@ -20,9 +22,24 @@ type Context struct {
 	IsAdmin     bool
 	CSRFToken   string
 	FlashMsg    string
-	WikiName	string
+	Config		WikiConfig
 }
 
+type WikiConfig struct {
+	WikiName		string
+	SignupDisabled	bool
+	SMTPHost		string
+	SMTPPort		string
+	SMTPUser		string
+	SMTPPasswd		string
+	FromEmail		string
+}
+
+var configCache WikiConfig
+var configCacheDate time.Time
+
+
+const maxConfigCacheLife = 5*time.Minute
 const maxSessionLife = 200*time.Hour
 const maxSessionLifeBeforeUpdate = 100*time.Hour
 
@@ -53,11 +70,37 @@ func ReadContext(sessionID string) Context {
 			}
 		} else {
 			// Invalid sessionid
-			log.Printf("[INFO] Attempted to use invalid session (id: %s). Error msg: %s\n", sessionID, err)
+			//log.Printf("[INFO] Attempted to use invalid session (id: %s). Error msg: %s\n", sessionID, err)
 		}
+
+		db.Exec(`DELETE FROM sessions WHERE updated_date < ?;`, int64(time.Now().Add(-maxSessionLife).Unix()))
 	}
 
-	db.Exec(`DELETE FROM sessions WHERE updated_date < ?;`, int64(time.Now().Add(-maxSessionLife).Unix()))
+	if true {//configCacheDate.Before(time.Now().Add(-maxConfigCacheLife)) {
+		config := WikiConfig{
+			"Femtowiki",
+			false,
+			"",
+			"",
+			"",
+			"",
+			"",
+		} // Default config
+
+		configJSON := models.ReadConfig(models.ConfigJSON)
+		if configJSON != "" {
+			var newConfig WikiConfig
+			if err := json.Unmarshal([]byte(configJSON), &newConfig); err == nil {
+				config = newConfig
+			} else {
+				log.Printf("[ERROR] Invalid config: %s\n", configJSON)
+			}
+		}
+		configCache = config
+		configCacheDate = time.Now()
+	}
+
+	ctx.Config = configCache
 
 	return ctx
 }

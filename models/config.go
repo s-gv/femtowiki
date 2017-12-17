@@ -8,6 +8,7 @@ import "github.com/s-gv/femtowiki/models/db"
 
 const (
 	Version = "version"
+	ConfigJSON = "config_json"
 )
 
 func WriteConfig(key string, val string) {
@@ -19,4 +20,12 @@ func WriteConfig(key string, val string) {
 	} else {
 		db.Exec(`INSERT INTO configs(name, val) values(?, ?);`, key, val)
 	}
+}
+
+func ReadConfig(key string) string {
+	var val string
+	if db.QueryRow(`SELECT val FROM configs WHERE name=?;`, key).Scan(&val) == nil {
+		return val
+	}
+	return ""
 }
