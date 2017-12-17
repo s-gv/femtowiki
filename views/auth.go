@@ -52,29 +52,33 @@ var SignupHandler = UA(func(w http.ResponseWriter, r *http.Request, ctx *Context
 		passwd := r.PostFormValue("passwd")
 		passwd2 := r.PostFormValue("passwd2")
 
-		if err := models.ValidateUsername(username); err == nil {
-			if passwd == passwd2 {
-				if err := models.ValidatePasswd(passwd); err == nil {
-					if err := models.CreateUser(username, passwd, "", false); err == nil {
-						if err := ctx.Authenticate(username, passwd); err == nil {
-							http.SetCookie(w, &http.Cookie{Name: "sessionid", Path: "/", Value: ctx.SessionID, HttpOnly: true})
-							http.Redirect(w, r, "/", http.StatusSeeOther)
+		if !ctx.Config.SignupDisabled {
+			if err := models.ValidateUsername(username); err == nil {
+				if passwd == passwd2 {
+					if err := models.ValidatePasswd(passwd); err == nil {
+						if err := models.CreateUser(username, passwd, "", false); err == nil {
+							if err := ctx.Authenticate(username, passwd); err == nil {
+								http.SetCookie(w, &http.Cookie{Name: "sessionid", Path: "/", Value: ctx.SessionID, HttpOnly: true})
+								http.Redirect(w, r, "/", http.StatusSeeOther)
+								return
+							} else {
+								ctx.FlashMsg = err.Error()
+							}
 							return
 						} else {
 							ctx.FlashMsg = err.Error()
 						}
-						return
 					} else {
 						ctx.FlashMsg = err.Error()
 					}
 				} else {
-					ctx.FlashMsg = err.Error()
+					ctx.FlashMsg = "Passwords don't match"
 				}
 			} else {
-				ctx.FlashMsg = "Passwords don't match"
+				ctx.FlashMsg = err.Error()
 			}
 		} else {
-			ctx.FlashMsg = err.Error()
+			ctx.FlashMsg = "Signup disabled. Contact admin."
 		}
 	}
 	templates.Render(w, "signup.html", map[string]interface{}{

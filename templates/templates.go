@@ -33,6 +33,9 @@ func init() {
 
 	tmpls["profile.html"] = template.Must(template.New("base").Parse(baseSrc))
 	template.Must(tmpls["profile.html"].New("profile").Parse(profileSrc))
+
+	tmpls["admin.html"] = template.Must(template.New("base").Parse(baseSrc))
+	template.Must(tmpls["admin.html"].New("admin").Parse(adminSrc))
 }
 
 func Render(wr io.Writer, template string, data interface{}) {

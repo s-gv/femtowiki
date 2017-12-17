@@ -11,6 +11,18 @@ const (
 	ConfigJSON = "config_json"
 )
 
+const (
+	DefaultConfigJSON = `{
+	"WikiName": "Femtowiki",
+	"SignupDisabled": false,
+	"SMTPHost": "",
+	"SMTPPort": "",
+	"SMTPUser": "",
+	"SMTPPasswd": "",
+	"FromEmail": ""
+}`
+)
+
 func WriteConfig(key string, val string) {
 	var oldVal string
 	if db.QueryRow(`SELECT val FROM configs WHERE name=?;`, key).Scan(&oldVal) == nil {

@@ -228,7 +228,7 @@ a:visited {
 .form-group a, .form-group span {
 	font-size: 14px;
 }
-input[type="text"].form-control, input[type="password"].form-control, input[type="email"].form-control {
+input[type="text"].form-control, input[type="password"].form-control, input[type="email"].form-control, textarea.form-control {
 	padding: 5px;
 	border: 1px solid #ccc;
 	border-radius: 4px;

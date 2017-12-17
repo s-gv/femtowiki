@@ -110,7 +110,7 @@ func Migrate() {
 			Migration1()
 
 			WriteConfig(Version, "1")
-			WriteConfig(ConfigJSON, `{"WikiName": "Femtowiki"}`)
+			WriteConfig(ConfigJSON, DefaultConfigJSON)
 		}
 		dbver = db.Version()
 	}
