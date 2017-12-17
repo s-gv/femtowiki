@@ -143,6 +143,8 @@ func main() {
 	mux.HandleFunc("/resetpass", views.ResetpassHandler)
 	mux.HandleFunc("/logout", views.LogoutHandler)
 
+	mux.HandleFunc("/profile", views.ProfileHandler)
+	mux.HandleFunc("/profile/update", views.ProfileUpdateHandler)
 
 	if *fcgiMode {
 		fcgi.Serve(nil, mux)

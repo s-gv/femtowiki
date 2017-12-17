@@ -57,7 +57,7 @@ func ReadContext(sessionID string) Context {
 					tNow := int64(time.Now().Unix())
 					db.Exec(`UPDATE sessions SET updated_date=? WHERE sessionid=?;`, tNow, sessionID)
 				}
-				db.Exec(`UPDATE sessions SET msg=? WHERE sessionid=?;`, "", ctx.SessionID)
+				db.Exec(`UPDATE sessions SET msg=? WHERE sessionid=?;`, "", sessionID)
 				ctx.SessionID = sessionID
 				ctx.FlashMsg = flashmsg
 				ctx.UserName = username

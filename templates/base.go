@@ -25,7 +25,7 @@ const baseSrc = `<!DOCTYPE html>
 			{{ if .ctx.IsUserValid }}
 			<div id="section-profile">
 				<span class="section-profile-link">
-					<a href="/profile?user={{ .ctx.UserName }}">{{ .ctx.UserName }}</a>
+					<a href="/profile?u={{ .ctx.UserName }}">{{ .ctx.UserName }}</a>
 					{{ if .ctx.IsAdmin }}(<a href="/admin">admin</a>){{ end }}
 				</span>
 				<span class="section-profile-link"><a href="/logout">Logout</a></span>
