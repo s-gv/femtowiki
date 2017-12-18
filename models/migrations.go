@@ -114,6 +114,7 @@ func Migrate() {
 			WriteConfig(HeaderLinks, DefaultHeaderLinks)
 			WriteConfig(FooterLinks, DefaultFooterLinks)
 			WriteConfig(NavSections, DefaultNavSections)
+			WriteConfig(IllegalUsernames, DefaultIllegalUsernames)
 		}
 		dbver = db.Version()
 	}

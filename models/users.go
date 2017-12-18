@@ -12,6 +12,8 @@ import (
 	"github.com/s-gv/femtowiki/models/db"
 	"errors"
 	"log"
+	"strings"
+	"encoding/json"
 )
 
 func CreateSuperUser(username string, passwd string) error {
@@ -41,6 +43,17 @@ func ValidateUsername(username string) error {
 	for _, ch := range username {
 		if (ch < 'A' || ch > 'Z') && (ch < 'a' || ch > 'z') && (ch != '_') && (ch != '-') && (ch < '0' || ch > '9') {
 			return errors.New("Username may contain only characters, numbers, underscore, and hyphen.")
+		}
+	}
+	illegalUsernameJSON := ReadConfig(IllegalUsernames)
+	var illegalUsernames []string
+	if err := json.Unmarshal([]byte(illegalUsernameJSON), &illegalUsernames); err != nil {
+		json.Unmarshal([]byte(DefaultIllegalUsernames), &illegalUsernames)
+		log.Printf("[ERROR] Invalid illegal usernames: %s\n", illegalUsernameJSON)
+	}
+	for _, illegalName := range illegalUsernames {
+		if strings.Contains(username, illegalName) {
+			return errors.New("Illegal username")
 		}
 	}
 	return nil

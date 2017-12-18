@@ -22,10 +22,12 @@ var AdminHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *Context) 
 		"header": models.ReadConfig(models.HeaderLinks),
 		"footer": models.ReadConfig(models.FooterLinks),
 		"nav": models.ReadConfig(models.NavSections),
+		"illegal_usernames": models.ReadConfig(models.IllegalUsernames),
 		"DefaultConfig": models.DefaultConfigJSON,
 		"DefaultHeader": models.DefaultHeaderLinks,
 		"DefaultFooter": models.DefaultFooterLinks,
 		"DefaultNav": models.DefaultNavSections,
+		"DefaultIllegalUsernames": models.DefaultIllegalUsernames,
 	})
 })
 
@@ -70,5 +72,16 @@ var AdminNavUpdateHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *
 	models.WriteConfig(models.NavSections, r.PostFormValue("nav"))
 	ctxCacheDate = time.Unix(0, 0)
 	ctx.SetFlashMsg("Nav updated")
+	http.Redirect(w, r, "/admin", http.StatusSeeOther)
+})
+
+var AdminIllegalUsernameUpdateHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *Context) {
+	if !ctx.IsAdmin || r.Method != "POST" {
+		ErrForbiddenHandler(w, r)
+		return
+	}
+	models.WriteConfig(models.IllegalUsernames, r.PostFormValue("illegal_usernames"))
+	ctxCacheDate = time.Unix(0, 0)
+	ctx.SetFlashMsg("Illegal username list updated")
 	http.Redirect(w, r, "/admin", http.StatusSeeOther)
 })

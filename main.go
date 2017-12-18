@@ -154,6 +154,7 @@ func main() {
 	mux.HandleFunc("/admin/header", views.AdminHeaderUpdateHandler)
 	mux.HandleFunc("/admin/footer", views.AdminFooterUpdateHandler)
 	mux.HandleFunc("/admin/nav", views.AdminNavUpdateHandler)
+	mux.HandleFunc("/admin/illegalusernames", views.AdminIllegalUsernameUpdateHandler)
 
 	if *fcgiMode {
 		fcgi.Serve(nil, mux)

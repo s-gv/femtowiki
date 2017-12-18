@@ -12,6 +12,7 @@ const (
 	HeaderLinks = "header_links"
 	FooterLinks = "footer_links"
 	NavSections = "nav_sections"
+	IllegalUsernames = "illegal_usernames"
 )
 
 const (
@@ -38,6 +39,7 @@ const (
 	{"Title": "", "Links": [{"Title": "Home", "URL": "/"}, {"Title": "Help", "URL": "/pages/Help"}]},
 	{"Title": "Cities", "Links": [{"Title": "Bangalore", "URL": "/pages/Bangalore"}, {"Title": "London", "URL": "/pages/London"}, {"Title": "New York", "URL": "/pages/New_York"}]}
 ]`
+	DefaultIllegalUsernames = `["shit", "crap"]`
 )
 
 func WriteConfig(key string, val string) {

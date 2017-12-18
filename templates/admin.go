@@ -66,6 +66,18 @@ const adminSrc = `
 	</form>
 </div>
 
+<div class="form-container">
+	<form action="/admin/illegalusernames" method="POST">
+		<input type="hidden" name="csrf" value="{{ .ctx.CSRFToken }}">
+		<h3>Illegal usernames</h3>
+		<div class="form-group">
+			Sample illegal username list: <pre>{{ .DefaultIllegalUsernames }}</pre>
+		</div>
+		<div class="form-group"><textarea class="form-control" rows="15" name="illegal_usernames">{{ .illegal_usernames }}</textarea></div>
+		<input type="submit" class="btn btn-default" value="Update Illegal usernames">
+	</form>
+</div>
+
 {{ end }}
 `
 
