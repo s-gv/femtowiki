@@ -34,6 +34,7 @@ var ProfileHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *Context
 		"ctx": ctx,
 		"username": username,
 		"email": email,
+		"IsBanned": isBanned,
 	})
 })
 
@@ -50,5 +51,38 @@ var ProfileUpdateHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *C
 	email := r.PostFormValue("email")
 	db.Exec(`UPDATE users SET email=? WHERE username=?;`, email, username)
 	ctx.SetFlashMsg("Email updated")
+	http.Redirect(w, r, "/profile?u="+username, http.StatusSeeOther)
+})
+
+var ProfileBanHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *Context) {
+	if r.Method != "POST" {
+		ErrForbiddenHandler(w, r)
+		return
+	}
+	username := r.PostFormValue("username")
+	if !ctx.IsAdmin {
+		ErrForbiddenHandler(w, r)
+		return
+	}
+	db.Exec(`UPDATE users SET is_banned=? WHERE username=?;`, true, username)
+
+	var userID string
+	if db.QueryRow(`SELECT id FROM users WHERE username=?;`, username).Scan(&userID) == nil {
+		db.Exec(`DELETE FROM sessions WHERE userid=?;`, userID)
+	}
+	http.Redirect(w, r, "/profile?u="+username, http.StatusSeeOther)
+})
+
+var ProfileUnbanHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *Context) {
+	if r.Method != "POST" {
+		ErrForbiddenHandler(w, r)
+		return
+	}
+	username := r.PostFormValue("username")
+	if !ctx.IsAdmin {
+		ErrForbiddenHandler(w, r)
+		return
+	}
+	db.Exec(`UPDATE users SET is_banned=? WHERE username=?;`, false, username)
 	http.Redirect(w, r, "/profile?u="+username, http.StatusSeeOther)
 })

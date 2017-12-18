@@ -146,6 +146,8 @@ func main() {
 
 	mux.HandleFunc("/profile", views.ProfileHandler)
 	mux.HandleFunc("/profile/update", views.ProfileUpdateHandler)
+	mux.HandleFunc("/profile/ban", views.ProfileBanHandler)
+	mux.HandleFunc("/profile/unban", views.ProfileUnbanHandler)
 
 	mux.HandleFunc("/admin", views.AdminHandler)
 	mux.HandleFunc("/admin/config", views.AdminConfigUpdateHandler)

@@ -87,40 +87,44 @@ var SignupHandler = UA(func(w http.ResponseWriter, r *http.Request, ctx *Context
 })
 
 var ChangepassHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *Context) {
-	if r.Method == "POST" {
-		oldPasswd := r.PostFormValue("oldpasswd")
-		if err := models.VerifyPasswd(ctx.UserName, oldPasswd); err != nil {
-			ctx.SetFlashMsg(err.Error())
-			http.Redirect(w, r, "/changepass", http.StatusSeeOther)
-			return
-		}
-
-		newPasswd := r.PostFormValue("passwd")
-		newPasswd2 := r.PostFormValue("passwd2")
-		if err := models.ValidatePasswd(newPasswd); err != nil {
-			ctx.SetFlashMsg(err.Error())
-			http.Redirect(w, r, "/changepass", http.StatusSeeOther)
-			return
-		}
-		if newPasswd != newPasswd2 {
-			ctx.SetFlashMsg("New passwords do not match")
-			http.Redirect(w, r, "/changepass", http.StatusSeeOther)
-			return
-		}
-
-		if err := models.UpdateUserPasswd(ctx.UserName, newPasswd); err != nil {
-			ctx.SetFlashMsg(err.Error())
-			http.Redirect(w, r, "/changepass", http.StatusSeeOther)
-			return
-		}
-
-		ctx.SetFlashMsg("Password changed successfully")
-		http.Redirect(w, r, "/changepass", http.StatusSeeOther)
+	if r.Method != "POST" {
+		ErrForbiddenHandler(w, r)
 		return
 	}
-	templates.Render(w, "changepass.html", map[string]interface{}{
-		"ctx": ctx,
-	})
+
+	username := r.PostFormValue("username")
+	oldPasswd := r.PostFormValue("oldpasswd")
+	newPasswd := r.PostFormValue("passwd")
+	newPasswd2 := r.PostFormValue("passwd2")
+
+	if !ctx.IsAdmin {
+		if err := models.VerifyPasswd(username, oldPasswd); err != nil {
+			ctx.SetFlashMsg(err.Error())
+			http.Redirect(w, r, "/profile?u="+username, http.StatusSeeOther)
+			return
+		}
+	}
+
+	if err := models.ValidatePasswd(newPasswd); err != nil {
+		ctx.SetFlashMsg(err.Error())
+		http.Redirect(w, r, "/profile?u="+username, http.StatusSeeOther)
+		return
+	}
+	if newPasswd != newPasswd2 {
+		ctx.SetFlashMsg("New passwords do not match")
+		http.Redirect(w, r, "/profile?u="+username, http.StatusSeeOther)
+		return
+	}
+
+	if err := models.UpdateUserPasswd(username, newPasswd); err != nil {
+		ctx.SetFlashMsg(err.Error())
+		http.Redirect(w, r, "/profile?u="+username, http.StatusSeeOther)
+		return
+	}
+
+	ctx.SetFlashMsg("Password changed successfully")
+	http.Redirect(w, r, "/profile?u="+username, http.StatusSeeOther)
+	return
 })
 
 var ForgotpassHandler = UA(func(w http.ResponseWriter, r *http.Request, ctx *Context) {
@@ -191,10 +195,15 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 var LogoutAllHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *Context) {
+	username := r.FormValue("u")
+	if !ctx.IsAdmin && (username != ctx.UserName) {
+		ErrForbiddenHandler(w, r)
+		return
+	}
+
 	var userID string
-	if db.QueryRow(`SELECT id FROM users WHERE users.username=?;`, ctx.UserName).Scan(&userID) == nil {
+	if db.QueryRow(`SELECT id FROM users WHERE users.username=?;`, username).Scan(&userID) == nil {
 		db.Exec(`DELETE FROM sessions WHERE userid=?;`, userID)
 	}
-	http.SetCookie(w, &http.Cookie{Name: "sessionid", Value: "", Expires: time.Now().Add(-300*time.Hour), HttpOnly: true})
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 })

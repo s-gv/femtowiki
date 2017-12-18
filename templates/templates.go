@@ -22,9 +22,6 @@ func init() {
 	tmpls["signup.html"] = template.Must(template.New("base").Parse(baseSrc))
 	template.Must(tmpls["signup.html"].New("signup").Parse(signupSrc))
 
-	tmpls["changepass.html"] = template.Must(template.New("base").Parse(baseSrc))
-	template.Must(tmpls["changepass.html"].New("changepass").Parse(changepassSrc))
-
 	tmpls["forgotpass.html"] = template.Must(template.New("base").Parse(baseSrc))
 	template.Must(tmpls["forgotpass.html"].New("forgotpass").Parse(forgotpassSrc))
 
