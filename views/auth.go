@@ -189,3 +189,12 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, &http.Cookie{Name: "sessionid", Value: "", Expires: time.Now().Add(-300*time.Hour), HttpOnly: true})
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
+
+var LogoutAllHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *Context) {
+	var userID string
+	if db.QueryRow(`SELECT id FROM users WHERE users.username=?;`, ctx.UserName).Scan(&userID) == nil {
+		db.Exec(`DELETE FROM sessions WHERE userid=?;`, userID)
+	}
+	http.SetCookie(w, &http.Cookie{Name: "sessionid", Value: "", Expires: time.Now().Add(-300*time.Hour), HttpOnly: true})
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+})

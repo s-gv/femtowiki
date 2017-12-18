@@ -142,6 +142,7 @@ func main() {
 	mux.HandleFunc("/forgotpass", views.ForgotpassHandler)
 	mux.HandleFunc("/resetpass", views.ResetpassHandler)
 	mux.HandleFunc("/logout", views.LogoutHandler)
+	mux.HandleFunc("/logoutall", views.LogoutAllHandler)
 
 	mux.HandleFunc("/profile", views.ProfileHandler)
 	mux.HandleFunc("/profile/update", views.ProfileUpdateHandler)
