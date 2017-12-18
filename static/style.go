@@ -222,6 +222,9 @@ a:visited {
 		width: 360px;
 	}
 }
+.form-inline {
+	display: inline;
+}
 .form-group {
 	margin: 8px 0px;
 }
@@ -242,11 +245,15 @@ textarea:focus, input[type="text"]:focus, input[type="password"]:focus, input[ty
 	padding: 6px 12px;
 	border-radius: 4px;
 	border: none;
+	color: #fff;
 	width: 100%;
+}
+.btn-inline {
+	width: auto;
+	margin: 0 8px;
 }
 .btn-default {
 	background-color: #08c;
-	color: #fff;
 }
 .btn-default:hover {
 	background-color: #0099E6;
@@ -254,6 +261,17 @@ textarea:focus, input[type="text"]:focus, input[type="password"]:focus, input[ty
 }
 .btn-default:active {
 	background-color: #006699;
+	cursor: pointer;
+}
+.btn-danger {
+	background-color: #ef5350;
+}
+.btn-danger:hover {
+	background-color: #e57373;
+	cursor: pointer;
+}
+.btn-danger:active {
+	background-color: #d32f2f;
 	cursor: pointer;
 }
 

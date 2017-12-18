@@ -10,6 +10,7 @@ import (
 	"github.com/s-gv/femtowiki/models"
 	"time"
 	"github.com/s-gv/femtowiki/models/db"
+	"database/sql"
 )
 
 var AdminHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *Context) {
@@ -112,15 +113,107 @@ var AdminGroupHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *Cont
 		return
 	}
 
-	var users []string
-	rows := db.Query(`SELECT username FROM users;`)
+	var groups []string
+	rows := db.Query(`SELECT name FROM groups;`)
 	for rows.Next() {
-		var user string
-		rows.Scan(&user)
-		users = append(users, user)
+		var group string
+		rows.Scan(&group)
+		groups = append(groups, group)
 	}
 	templates.Render(w, "admingroups.html", map[string]interface{}{
 		"ctx": ctx,
-		"users": users,
+		"groups": groups,
 	})
+})
+
+var AdminGroupCreateHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *Context) {
+	if !ctx.IsAdmin || r.Method != "POST" {
+		ErrForbiddenHandler(w, r)
+		return
+	}
+	groupname := r.PostFormValue("groupname")
+	var tmp string
+	if db.QueryRow(`SELECT id FROM groups WHERE name=?;`, groupname).Scan(&tmp) == sql.ErrNoRows {
+		tNow := time.Now().Unix()
+		db.Exec(`INSERT INTO groups(name, created_date, updated_date) VALUES(?, ?, ?);`, groupname, tNow, tNow)
+	} else {
+		ctx.SetFlashMsg("Group '" + groupname + "' already exits")
+	}
+	http.Redirect(w, r, "/admin/groups", http.StatusSeeOther)
+})
+
+var AdminGroupDeleteHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *Context) {
+	if !ctx.IsAdmin || r.Method != "POST" {
+		ErrForbiddenHandler(w, r)
+		return
+	}
+	groupname := r.PostFormValue("groupname")
+	db.Exec(`DELETE FROM groups WHERE name=?;`, groupname)
+	ctx.SetFlashMsg("Group deleted")
+	http.Redirect(w, r, "/admin/groups", http.StatusSeeOther)
+})
+
+var AdminGroupMembersHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *Context) {
+	if !ctx.IsAdmin {
+		ErrForbiddenHandler(w, r)
+		return
+	}
+	groupname := r.FormValue("g")
+	var members []string
+	rows := db.Query(`SELECT users.username FROM groupmembers INNER JOIN users ON groupmembers.userid=users.id INNER JOIN groups ON groupmembers.groupid=groups.id AND groups.name=?;`, groupname)
+	for rows.Next() {
+		var member string
+		rows.Scan(&member)
+		members = append(members, member)
+	}
+	templates.Render(w, "admingroupmembers.html", map[string]interface{}{
+		"ctx": ctx,
+		"groupname": groupname,
+		"members": members,
+	})
+})
+
+var AdminGroupMemberCreateHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *Context) {
+	if !ctx.IsAdmin || r.Method != "POST" {
+		ErrForbiddenHandler(w, r)
+		return
+	}
+	groupname := r.PostFormValue("groupname")
+	username := r.PostFormValue("username")
+
+	var groupID string
+	if db.QueryRow(`SELECT id FROM groups WHERE name=?;`, groupname).Scan(&groupID) == nil {
+		var userID string
+		if db.QueryRow(`SELECT id FROM users WHERE username=?;`, username).Scan(&userID) == nil {
+			var tmp string
+			if db.QueryRow(`SELECT id FROM groupmembers WHERE userid=? AND groupid=?;`, userID, groupID).Scan(&tmp) == sql.ErrNoRows {
+				tNow := time.Now().Unix()
+				db.Exec(`INSERT INTO groupmembers(groupid, userid, created_date) VALUES(?, ?, ?);`, groupID, userID, tNow)
+				ctx.SetFlashMsg("Added user '"+username+"'")
+			} else {
+				ctx.SetFlashMsg("User '"+username+"' already in this group")
+			}
+		} else {
+			ctx.SetFlashMsg("User '"+username+"' not found")
+		}
+	}
+	http.Redirect(w, r, "/admin/groupmembers?g="+groupname, http.StatusSeeOther)
+})
+
+var AdminGroupMemberDeleteHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *Context) {
+	if !ctx.IsAdmin || r.Method != "POST" {
+		ErrForbiddenHandler(w, r)
+		return
+	}
+	groupname := r.PostFormValue("groupname")
+	username := r.PostFormValue("username")
+
+	var userID string
+	if db.QueryRow(`SELECT id FROM users WHERE username=?;`, username).Scan(&userID) == nil {
+		db.Exec(`DELETE FROM groupmembers WHERE userid=?;`, userID)
+		ctx.SetFlashMsg("User '"+username+"' removed from this group")
+	} else {
+		ctx.SetFlashMsg("User '"+username+"' not in this group")
+	}
+	http.Redirect(w, r, "/admin/groupmembers?g="+groupname, http.StatusSeeOther)
 })

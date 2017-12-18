@@ -42,8 +42,14 @@ const profileSrc = `
 	</form>
 	{{ if .ctx.IsAdmin }}
 	{{ if ne .ctx.UserName .username }}
-	<h3>Ban/Unban user</h3>
-	<p>A banned user will be prevented from logging in.</p>
+	<h3>Ban / Unban user</h3>
+	<p>
+		{{ if .IsBanned }}
+		<span class="flash">{{ .username }} is banned from signing in.</span>
+		{{ else }}
+		A banned user will be prevented from logging in.
+		{{ end }}
+	</p>
 	{{ if .IsBanned }}
 	<form action="/profile/unban" method="POST">
 	{{ else }}
@@ -51,7 +57,11 @@ const profileSrc = `
 	{{ end }}
 		<input type="hidden" name="csrf" value="{{ .ctx.CSRFToken }}">
 		<input type="hidden" name="username" value="{{ .username }}">
-		<input type="submit" class="btn btn-default" value="{{ if .IsBanned }}Unban{{ else }}Ban{{ end }} {{ .username }}">
+		{{ if .IsBanned }}
+		<input type="submit" class="btn btn-default" value="Unban {{ .username }}">
+		{{ else }}
+		<input type="submit" class="btn btn-danger" value="Ban {{ .username }}">
+		{{ end }}
 	</form>
 	{{ end }}
 	{{ end }}
