@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"github.com/s-gv/femtowiki/templates"
 	"github.com/s-gv/femtowiki/models"
+	"time"
 )
 
 var AdminHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *Context) {
@@ -28,6 +29,7 @@ var AdminConfigUpdateHandler = A(func(w http.ResponseWriter, r *http.Request, ct
 		return
 	}
 	models.WriteConfig(models.ConfigJSON, r.PostFormValue("config"))
+	ctxCacheDate = time.Unix(0, 0)
 	ctx.SetFlashMsg("Config updated successfully")
 	http.Redirect(w, r, "/admin", http.StatusSeeOther)
 })

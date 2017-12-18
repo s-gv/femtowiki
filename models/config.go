@@ -15,6 +15,7 @@ const (
 	DefaultConfigJSON = `{
 	"WikiName": "Femtowiki",
 	"SignupDisabled": false,
+	"DataDir": "",
 	"SMTPHost": "",
 	"SMTPPort": "",
 	"SMTPUser": "",

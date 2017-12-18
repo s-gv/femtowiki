@@ -28,6 +28,7 @@ type Context struct {
 type WikiConfig struct {
 	WikiName		string
 	SignupDisabled	bool
+	DataDir         string
 	SMTPHost		string
 	SMTPPort		string
 	SMTPUser		string
@@ -36,7 +37,7 @@ type WikiConfig struct {
 }
 
 var configCache WikiConfig
-var configCacheDate time.Time
+var ctxCacheDate time.Time
 
 
 const maxConfigCacheLife = 5*time.Minute
@@ -76,10 +77,11 @@ func ReadContext(sessionID string) Context {
 		db.Exec(`DELETE FROM sessions WHERE updated_date < ?;`, int64(time.Now().Add(-maxSessionLife).Unix()))
 	}
 
-	if true {//configCacheDate.Before(time.Now().Add(-maxConfigCacheLife)) {
+	if ctxCacheDate.Before(time.Now().Add(-maxConfigCacheLife)) {
 		config := WikiConfig{
 			"Femtowiki",
 			false,
+			"",
 			"",
 			"",
 			"",
@@ -97,7 +99,7 @@ func ReadContext(sessionID string) Context {
 			}
 		}
 		configCache = config
-		configCacheDate = time.Now()
+		ctxCacheDate = time.Now()
 	}
 
 	ctx.Config = configCache
