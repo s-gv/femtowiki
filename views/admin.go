@@ -9,6 +9,7 @@ import (
 	"github.com/s-gv/femtowiki/templates"
 	"github.com/s-gv/femtowiki/models"
 	"time"
+	"github.com/s-gv/femtowiki/models/db"
 )
 
 var AdminHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *Context) {
@@ -84,4 +85,42 @@ var AdminIllegalUsernameUpdateHandler = A(func(w http.ResponseWriter, r *http.Re
 	ctxCacheDate = time.Unix(0, 0)
 	ctx.SetFlashMsg("Illegal username list updated")
 	http.Redirect(w, r, "/admin", http.StatusSeeOther)
+})
+
+var AdminUserHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *Context) {
+	if !ctx.IsAdmin {
+		ErrForbiddenHandler(w, r)
+		return
+	}
+
+	var users []string
+	rows := db.Query(`SELECT username FROM users;`)
+	for rows.Next() {
+		var user string
+		rows.Scan(&user)
+		users = append(users, user)
+	}
+	templates.Render(w, "adminusers.html", map[string]interface{}{
+		"ctx": ctx,
+		"users": users,
+	})
+})
+
+var AdminGroupHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *Context) {
+	if !ctx.IsAdmin {
+		ErrForbiddenHandler(w, r)
+		return
+	}
+
+	var users []string
+	rows := db.Query(`SELECT username FROM users;`)
+	for rows.Next() {
+		var user string
+		rows.Scan(&user)
+		users = append(users, user)
+	}
+	templates.Render(w, "admingroups.html", map[string]interface{}{
+		"ctx": ctx,
+		"users": users,
+	})
 })

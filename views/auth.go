@@ -52,19 +52,23 @@ var SignupHandler = UA(func(w http.ResponseWriter, r *http.Request, ctx *Context
 		passwd := r.PostFormValue("passwd")
 		passwd2 := r.PostFormValue("passwd2")
 
-		if !ctx.Config.SignupDisabled {
+		if ctx.IsAdmin || !ctx.Config.SignupDisabled {
 			if err := models.ValidateUsername(username); err == nil {
 				if passwd == passwd2 {
 					if err := models.ValidatePasswd(passwd); err == nil {
 						if err := models.CreateUser(username, passwd, "", false); err == nil {
-							if err := ctx.Authenticate(username, passwd); err == nil {
-								http.SetCookie(w, &http.Cookie{Name: "sessionid", Path: "/", Value: ctx.SessionID, HttpOnly: true})
-								http.Redirect(w, r, "/", http.StatusSeeOther)
+							if ctx.IsAdmin {
+								http.Redirect(w, r, "/admin/users", http.StatusSeeOther)
 								return
 							} else {
-								ctx.FlashMsg = err.Error()
+								if err := ctx.Authenticate(username, passwd); err == nil {
+									http.SetCookie(w, &http.Cookie{Name: "sessionid", Path: "/", Value: ctx.SessionID, HttpOnly: true})
+									http.Redirect(w, r, "/", http.StatusSeeOther)
+									return
+								} else {
+									ctx.FlashMsg = err.Error()
+								}
 							}
-							return
 						} else {
 							ctx.FlashMsg = err.Error()
 						}

@@ -6,10 +6,6 @@ package templates
 
 const adminSrc = `
 {{ define "content" }}
-
-
-
-
 <div class="form-container">
 	<h2>Admin section</h2>
 
@@ -18,6 +14,9 @@ const adminSrc = `
 		<span class="flash">{{ .ctx.FlashMsg }}</span>
 	</div>
 	{{ end }}
+
+	<h3><a href="/admin/users">Users</a></h3>
+	<h3><a href="/admin/groups">Groups</a></h3>
 
 	<form action="/admin/config" method="POST">
 		<input type="hidden" name="csrf" value="{{ .ctx.CSRFToken }}">

@@ -18,9 +18,11 @@ const signupSrc = `
 		<div class="form-group">
 			<input type="password" class="form-control" name="passwd2" placeholder="Confirm password">
 		</div>
+		{{ if not .ctx.IsUserValid }}
 		<div class="form-group">
 			<span>Already have an account?</span> <a href="/login">Signin</a>
 		</div>
+		{{ end }}
 		{{ if .ctx.FlashMsg }}
 		<div class="form-group">
 			<span class="flash">{{ .ctx.FlashMsg }}</span>

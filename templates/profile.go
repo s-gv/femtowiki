@@ -7,11 +7,11 @@ package templates
 const profileSrc = `
 {{ define "content" }}
 <div class="form-container">
-	<h2>{{ .username }}</h2>
+	<h2>User profile: {{ .username }}</h2>
 	{{ if .ctx.FlashMsg }}
 	<span class="flash">{{ .ctx.FlashMsg }}</span>
 	{{ end }}
-	<h3>Change email</h3>
+	<h3>Email</h3>
 	<form action="/profile/update" method="POST">
 		<input type="hidden" name="csrf" value="{{ .ctx.CSRFToken }}">
 		<input type="hidden" name="username" value="{{ .username }}">
@@ -20,7 +20,7 @@ const profileSrc = `
 		</div>
 		<input type="submit" class="btn btn-default" value="Update Email">
 	</form>
-	<h3>Change password</h3>
+	<h3>Password</h3>
 	<form action="/changepass" method="POST">
 		<input type="hidden" name="csrf" value="{{ .ctx.CSRFToken }}">
 		<input type="hidden" name="username" value="{{ .username }}">
