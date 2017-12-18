@@ -18,7 +18,10 @@ const baseSrc = `<!DOCTYPE html>
 </head>
 <body>
 	<div id="header">
-		<div class="logo"><a href="/">{{ .ctx.Config.WikiName }}</a></div> <a href="">Home</a> <a href="">Download</a> <a href="">FAQ</a>
+		<div class="logo"><a href="/">{{ .ctx.Config.WikiName }}</a></div>
+		{{ range .ctx.HeaderLinks }}
+			<a href="{{ .URL }}">{{ .Title }}</a>
+		{{ end }}
 	</div>
 	<div id="container">
 		<div id="content">
@@ -38,34 +41,24 @@ const baseSrc = `<!DOCTYPE html>
 			{{ block "content" . }}{{ end }}
 		</div>
 		<div id="nav">
+			{{ range .ctx.NavSections }}
 			<div class="nav-section">
+				{{ if .Title }}
+					<h3>{{ .Title }}</h3>
+					<hr>
+				{{ end }}
 				<ul>
-					<li><a href="">Home</a></li>
-					<li><a href="">Download</a></li>
-					<li><a href="">FAQ</a></li>
+				{{ range .Links }}
+					<li><a href="{{ .URL }}">{{ .Title }}</a></li>
+				{{ end }}
 				</ul>
 			</div>
-			<div class="nav-section">
-				<h3>Cities</h3>
-				<hr>
-				<ul>
-					<li><a href="">London</a></li>
-					<li><a href="">New York</a></li>
-					<li><a href="">Bangalore</a></li>
-				</ul>
-			</div>
-			<div class="nav-section">
-				<h3>Languages</h3>
-				<hr>
-				<ul>
-					<li><a href="">English</a></li>
-					<li><a href="">Hindi</a></li>
-					<li><a href="">Kannada</a></li>
-				</ul>
-			</div>
+			{{ end }}
 		</div>
 		<div id="footer">
-			<a href="">Privacy</a> <a href="">Terms</a> <a href="">Help</a>
+			{{ range .ctx.FooterLinks }}
+			<a href="{{ .URL }}">{{ .Title }}</a>
+			{{ end }}
 		</div>
 	</div>
 	<script src="/static/js/femtowiki.js?v=010"></script>

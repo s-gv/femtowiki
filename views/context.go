@@ -23,6 +23,9 @@ type Context struct {
 	CSRFToken   string
 	FlashMsg    string
 	Config		WikiConfig
+	HeaderLinks []NavLink
+	FooterLinks []NavLink
+	NavSections []NavSection
 }
 
 type WikiConfig struct {
@@ -36,7 +39,20 @@ type WikiConfig struct {
 	FromEmail		string
 }
 
+type NavLink struct {
+	Title string
+	URL   string
+}
+
+type NavSection struct {
+	Title string
+	Links []NavLink
+}
+
 var configCache WikiConfig
+var headerLinksCache []NavLink
+var footerLinksCache []NavLink
+var navSectionsCache []NavSection
 var ctxCacheDate time.Time
 
 
@@ -78,31 +94,49 @@ func ReadContext(sessionID string) Context {
 	}
 
 	if ctxCacheDate.Before(time.Now().Add(-maxConfigCacheLife)) {
-		config := WikiConfig{
-			"Femtowiki",
-			false,
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-		} // Default config
-
 		configJSON := models.ReadConfig(models.ConfigJSON)
-		if configJSON != "" {
-			var newConfig WikiConfig
-			if err := json.Unmarshal([]byte(configJSON), &newConfig); err == nil {
-				config = newConfig
-			} else {
-				log.Printf("[ERROR] Invalid config: %s\n", configJSON)
-			}
+		var config WikiConfig
+		if err := json.Unmarshal([]byte(configJSON), &config); err == nil {
+			configCache = config
+		} else {
+			json.Unmarshal([]byte(models.DefaultConfigJSON), &configCache)
+			log.Printf("[ERROR] Invalid config: %s\n", configJSON)
 		}
-		configCache = config
+
+		headerJSON := models.ReadConfig(models.HeaderLinks)
+		var headerLinks []NavLink
+		if err := json.Unmarshal([]byte(headerJSON), &headerLinks); err == nil {
+			headerLinksCache = headerLinks
+		} else {
+			json.Unmarshal([]byte(models.DefaultHeaderLinks), &headerLinksCache)
+			log.Printf("[ERROR] Invalid header links: %s\n", headerJSON)
+		}
+
+		footerJSON := models.ReadConfig(models.FooterLinks)
+		var footerLinks []NavLink
+		if err := json.Unmarshal([]byte(footerJSON), &footerLinks); err == nil {
+			footerLinksCache = footerLinks
+		} else {
+			json.Unmarshal([]byte(models.DefaultFooterLinks), &footerLinksCache)
+			log.Printf("[ERROR] Invalid footer links: %s\n", footerJSON)
+		}
+
+		navJSON := models.ReadConfig(models.NavSections)
+		var navSections []NavSection
+		if err := json.Unmarshal([]byte(navJSON), &navSections); err == nil {
+			navSectionsCache = navSections
+		} else {
+			json.Unmarshal([]byte(models.DefaultNavSections), &navSectionsCache)
+			log.Printf("[ERROR] Invalid nav sections: %s\n", navJSON)
+		}
+
 		ctxCacheDate = time.Now()
 	}
 
 	ctx.Config = configCache
+	ctx.HeaderLinks = headerLinksCache
+	ctx.FooterLinks = footerLinksCache
+	ctx.NavSections = navSectionsCache
 
 	return ctx
 }

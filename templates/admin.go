@@ -35,11 +35,9 @@ const adminSrc = `
 		<input type="hidden" name="csrf" value="{{ .ctx.CSRFToken }}">
 		<h3>Nav section</h3>
 		<div class="form-group">
-Default Config:
-<pre>
-Yohoho
-</pre>
+			Default Nav: <pre>{{ .DefaultNav }}</pre>
 		</div>
+		<div class="form-group"><textarea class="form-control" rows="15" name="nav">{{ .nav }}</textarea></div>
 		<input type="submit" class="btn btn-default" value="Update Nav">
 	</form>
 </div>
@@ -49,11 +47,9 @@ Yohoho
 		<input type="hidden" name="csrf" value="{{ .ctx.CSRFToken }}">
 		<h3>Header links</h3>
 		<div class="form-group">
-Default Config:
-<pre>
-Yohoho
-</pre>
+			Default Header: <pre>{{ .DefaultHeader }}</pre>
 		</div>
+		<div class="form-group"><textarea class="form-control" rows="15" name="header">{{ .header }}</textarea></div>
 		<input type="submit" class="btn btn-default" value="Update Header">
 	</form>
 </div>
@@ -63,11 +59,9 @@ Yohoho
 		<input type="hidden" name="csrf" value="{{ .ctx.CSRFToken }}">
 		<h3>Footer links</h3>
 		<div class="form-group">
-Default Config:
-<pre>
-Yohoho
-</pre>
+			Default Footer: <pre>{{ .DefaultFooter }}</pre>
 		</div>
+		<div class="form-group"><textarea class="form-control" rows="15" name="footer">{{ .footer }}</textarea></div>
 		<input type="submit" class="btn btn-default" value="Update Footer">
 	</form>
 </div>

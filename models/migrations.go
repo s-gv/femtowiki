@@ -111,6 +111,9 @@ func Migrate() {
 
 			WriteConfig(Version, "1")
 			WriteConfig(ConfigJSON, DefaultConfigJSON)
+			WriteConfig(HeaderLinks, DefaultHeaderLinks)
+			WriteConfig(FooterLinks, DefaultFooterLinks)
+			WriteConfig(NavSections, DefaultNavSections)
 		}
 		dbver = db.Version()
 	}

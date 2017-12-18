@@ -9,6 +9,9 @@ import "github.com/s-gv/femtowiki/models/db"
 const (
 	Version = "version"
 	ConfigJSON = "config_json"
+	HeaderLinks = "header_links"
+	FooterLinks = "footer_links"
+	NavSections = "nav_sections"
 )
 
 const (
@@ -22,6 +25,19 @@ const (
 	"SMTPPasswd": "",
 	"FromEmail": ""
 }`
+	DefaultHeaderLinks = `[
+	{"Title": "Home", "URL": "/"},
+	{"Title": "Download", "URL": "http://www.goodoldweb.com/"}
+]`
+	DefaultFooterLinks = `[
+	{"Title": "Femtowiki", "URL": "http://www.goodoldweb.com/"},
+	{"Title": "Privacy Policy", "URL": "/pages/Privacy_Policy"},
+	{"Title": "Terms Of Service", "URL": "/pages/Terms_Of_Service"}
+]`
+	DefaultNavSections = `[
+	{"Title": "", "Links": [{"Title": "Home", "URL": "/"}, {"Title": "Help", "URL": "/pages/Help"}]},
+	{"Title": "Cities", "Links": [{"Title": "Bangalore", "URL": "/pages/Bangalore"}, {"Title": "London", "URL": "/pages/London"}, {"Title": "New York", "URL": "/pages/New_York"}]}
+]`
 )
 
 func WriteConfig(key string, val string) {
