@@ -36,24 +36,24 @@ func CreateUser(username string, passwd string, email string, isSuperUser bool) 
 	return nil
 }
 
-func ValidateUsername(username string) error {
-	if len(username) < 2 || len(username) > 32 {
-		return errors.New("Username should have 2-32 characters.")
+func ValidateName(name string) error {
+	if len(name) < 2 || len(name) > 32 {
+		return errors.New("Name should have 2-32 characters.")
 	}
-	for _, ch := range username {
+	for _, ch := range name {
 		if (ch < 'A' || ch > 'Z') && (ch < 'a' || ch > 'z') && (ch != '_') && (ch != '-') && (ch < '0' || ch > '9') {
-			return errors.New("Username may contain only characters, numbers, underscore, and hyphen.")
+			return errors.New("Name may contain only characters, numbers, underscore, and hyphen.")
 		}
 	}
-	illegalUsernameJSON := ReadConfig(IllegalUsernames)
+	illegalUsernameJSON := ReadConfig(IllegalNames)
 	var illegalUsernames []string
 	if err := json.Unmarshal([]byte(illegalUsernameJSON), &illegalUsernames); err != nil {
-		json.Unmarshal([]byte(DefaultIllegalUsernames), &illegalUsernames)
-		log.Printf("[ERROR] Invalid illegal usernames: %s\n", illegalUsernameJSON)
+		json.Unmarshal([]byte(DefaultIllegalNames), &illegalUsernames)
+		log.Printf("[ERROR] Invalid illegal name list: %s\n", illegalUsernameJSON)
 	}
 	for _, illegalName := range illegalUsernames {
-		if strings.Contains(username, illegalName) {
-			return errors.New("Illegal username")
+		if strings.Contains(name, illegalName) {
+			return errors.New("Illegal name")
 		}
 	}
 	return nil

@@ -17,7 +17,21 @@ const adminSrc = `
 
 	<h3><a href="/admin/users">Users</a></h3>
 	<h3><a href="/admin/groups">Groups</a></h3>
+	<form action="/admin/crudgroup" method="POST">
+		<input type="hidden" name="csrf" value="{{ .ctx.CSRFToken }}">
+		<h3>Group permitted to create/delete pages</h3>
+		<p>
+			Members of this group will be permitted to create new pages or delete existing pages in the wiki.
+			Note that the group 'everybody' is a special group that includes all registered users.
+		</p>
+		<div class="form-group">
+			<input type="text" class="form-control" name="crudgroup" value="{{ .crudgroup }}" placeholder="Group name">
+		</div>
+		<input type="submit" class="btn btn-default" value="Update">
+	</form>
+</div>
 
+<div class="form-container">
 	<form action="/admin/config" method="POST">
 		<input type="hidden" name="csrf" value="{{ .ctx.CSRFToken }}">
 		<h3>Config</h3>
@@ -66,14 +80,14 @@ const adminSrc = `
 </div>
 
 <div class="form-container">
-	<form action="/admin/illegalusernames" method="POST">
+	<form action="/admin/illegalnames" method="POST">
 		<input type="hidden" name="csrf" value="{{ .ctx.CSRFToken }}">
-		<h3>Illegal usernames</h3>
+		<h3>Illegal names</h3>
 		<div class="form-group">
-			Sample illegal username list: <pre>{{ .DefaultIllegalUsernames }}</pre>
+			Sample illegal name list: <pre>{{ .DefaultIllegalNames }}</pre>
 		</div>
-		<div class="form-group"><textarea class="form-control" rows="15" name="illegal_usernames">{{ .illegal_usernames }}</textarea></div>
-		<input type="submit" class="btn btn-default" value="Update Illegal usernames">
+		<div class="form-group"><textarea class="form-control" rows="15" name="illegal_names">{{ .illegal_names }}</textarea></div>
+		<input type="submit" class="btn btn-default" value="Update Illegal names">
 	</form>
 </div>
 

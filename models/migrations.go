@@ -35,12 +35,10 @@ func Migration1() {
 	db.Exec(`CREATE TABLE groups(
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		name VARCHAR(250) DEFAULT '',
-		admingroupid INTEGER REFERENCES groups(id) ON DELETE SET NULL,
 		created_date INTEGER DEFAULT 0,
 		updated_date INTEGER DEFAULT 0
 	);`)
 	db.Exec(`CREATE UNIQUE INDEX groups_name_index on groups(name);`)
-	db.Exec(`CREATE INDEX groups_admingroupid_index on groups(admingroupid);`)
 
 	db.Exec(`CREATE TABLE groupmembers(
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -114,7 +112,8 @@ func Migrate() {
 			WriteConfig(HeaderLinks, DefaultHeaderLinks)
 			WriteConfig(FooterLinks, DefaultFooterLinks)
 			WriteConfig(NavSections, DefaultNavSections)
-			WriteConfig(IllegalUsernames, DefaultIllegalUsernames)
+			WriteConfig(IllegalNames, DefaultIllegalNames)
+			WriteConfig(CRUDGroup, DefaultCRUDGroup)
 		}
 		dbver = db.Version()
 	}

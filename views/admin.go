@@ -18,19 +18,36 @@ var AdminHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *Context) 
 		ErrForbiddenHandler(w, r)
 		return
 	}
+
 	templates.Render(w, "admin.html", map[string]interface{}{
 		"ctx": ctx,
+		"crudgroup": models.ReadCRUDGroup(),
 		"config": models.ReadConfig(models.ConfigJSON),
 		"header": models.ReadConfig(models.HeaderLinks),
 		"footer": models.ReadConfig(models.FooterLinks),
 		"nav": models.ReadConfig(models.NavSections),
-		"illegal_usernames": models.ReadConfig(models.IllegalUsernames),
+		"illegal_names": models.ReadConfig(models.IllegalNames),
 		"DefaultConfig": models.DefaultConfigJSON,
 		"DefaultHeader": models.DefaultHeaderLinks,
 		"DefaultFooter": models.DefaultFooterLinks,
 		"DefaultNav": models.DefaultNavSections,
-		"DefaultIllegalUsernames": models.DefaultIllegalUsernames,
+		"DefaultIllegalNames": models.DefaultIllegalNames,
 	})
+})
+
+var AdminCRUDGroupHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *Context) {
+	if !ctx.IsAdmin || r.Method != "POST" {
+		ErrForbiddenHandler(w, r)
+		return
+	}
+	CRUDGroup := r.PostFormValue("crudgroup")
+	var tmp string
+	if CRUDGroup == models.EverybodyGroup || db.QueryRow(`SELECT id FROM groups WHERE name=?;`, CRUDGroup).Scan(&tmp) == nil {
+		models.WriteConfig(models.CRUDGroup, CRUDGroup)
+	} else {
+		ctx.SetFlashMsg("Group '"+CRUDGroup+"' not found")
+	}
+	http.Redirect(w, r, "/admin", http.StatusSeeOther)
 })
 
 var AdminConfigUpdateHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *Context) {
@@ -77,14 +94,14 @@ var AdminNavUpdateHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *
 	http.Redirect(w, r, "/admin", http.StatusSeeOther)
 })
 
-var AdminIllegalUsernameUpdateHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *Context) {
+var AdminIllegalNamesUpdateHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *Context) {
 	if !ctx.IsAdmin || r.Method != "POST" {
 		ErrForbiddenHandler(w, r)
 		return
 	}
-	models.WriteConfig(models.IllegalUsernames, r.PostFormValue("illegal_usernames"))
+	models.WriteConfig(models.IllegalNames, r.PostFormValue("illegal_names"))
 	ctxCacheDate = time.Unix(0, 0)
-	ctx.SetFlashMsg("Illegal username list updated")
+	ctx.SetFlashMsg("Illegal name list updated")
 	http.Redirect(w, r, "/admin", http.StatusSeeOther)
 })
 
@@ -132,13 +149,22 @@ var AdminGroupCreateHandler = A(func(w http.ResponseWriter, r *http.Request, ctx
 		return
 	}
 	groupname := r.PostFormValue("groupname")
-	var tmp string
-	if db.QueryRow(`SELECT id FROM groups WHERE name=?;`, groupname).Scan(&tmp) == sql.ErrNoRows {
-		tNow := time.Now().Unix()
-		db.Exec(`INSERT INTO groups(name, created_date, updated_date) VALUES(?, ?, ?);`, groupname, tNow, tNow)
+	if groupname != models.EverybodyGroup {
+		if err := models.ValidateName(groupname); err == nil {
+			var tmp string
+			if db.QueryRow(`SELECT id FROM groups WHERE name=?;`, groupname).Scan(&tmp) == sql.ErrNoRows {
+				tNow := time.Now().Unix()
+				db.Exec(`INSERT INTO groups(name, created_date, updated_date) VALUES(?, ?, ?);`, groupname, tNow, tNow)
+			} else {
+				ctx.SetFlashMsg("Group '" + groupname + "' already exits")
+			}
+		} else {
+			ctx.SetFlashMsg(err.Error())
+		}
 	} else {
-		ctx.SetFlashMsg("Group '" + groupname + "' already exits")
+		ctx.SetFlashMsg("Group name '"+groupname+"' is reserved")
 	}
+
 	http.Redirect(w, r, "/admin/groups", http.StatusSeeOther)
 })
 

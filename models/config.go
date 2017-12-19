@@ -7,12 +7,13 @@ package models
 import "github.com/s-gv/femtowiki/models/db"
 
 const (
-	Version = "version"
-	ConfigJSON = "config_json"
-	HeaderLinks = "header_links"
-	FooterLinks = "footer_links"
-	NavSections = "nav_sections"
-	IllegalUsernames = "illegal_usernames"
+	Version      = "version"
+	CRUDGroup    = "crud_group"
+	ConfigJSON   = "config_json"
+	HeaderLinks  = "header_links"
+	FooterLinks  = "footer_links"
+	NavSections  = "nav_sections"
+	IllegalNames = "illegal_names"
 )
 
 const (
@@ -26,6 +27,7 @@ const (
 	"SMTPPasswd": "",
 	"FromEmail": ""
 }`
+	DefaultCRUDGroup = "everybody"
 	DefaultHeaderLinks = `[
 	{"Title": "Home", "URL": "/"},
 	{"Title": "Download", "URL": "http://www.goodoldweb.com/"}
@@ -39,7 +41,7 @@ const (
 	{"Title": "", "Links": [{"Title": "Home", "URL": "/"}, {"Title": "Help", "URL": "/pages/Help"}]},
 	{"Title": "Cities", "Links": [{"Title": "Bangalore", "URL": "/pages/Bangalore"}, {"Title": "London", "URL": "/pages/London"}, {"Title": "New York", "URL": "/pages/New_York"}]}
 ]`
-	DefaultIllegalUsernames = `["shit", "crap"]`
+	DefaultIllegalNames = `["shit", "crap"]`
 )
 
 func WriteConfig(key string, val string) {

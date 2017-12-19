@@ -154,7 +154,7 @@ func main() {
 	mux.HandleFunc("/admin/header", views.AdminHeaderUpdateHandler)
 	mux.HandleFunc("/admin/footer", views.AdminFooterUpdateHandler)
 	mux.HandleFunc("/admin/nav", views.AdminNavUpdateHandler)
-	mux.HandleFunc("/admin/illegalusernames", views.AdminIllegalUsernameUpdateHandler)
+	mux.HandleFunc("/admin/illegalnames", views.AdminIllegalNamesUpdateHandler)
 	mux.HandleFunc("/admin/users", views.AdminUserHandler)
 	mux.HandleFunc("/admin/groups", views.AdminGroupHandler)
 	mux.HandleFunc("/admin/groups/new", views.AdminGroupCreateHandler)
@@ -162,6 +162,7 @@ func main() {
 	mux.HandleFunc("/admin/groupmembers", views.AdminGroupMembersHandler)
 	mux.HandleFunc("/admin/groupmembers/new", views.AdminGroupMemberCreateHandler)
 	mux.HandleFunc("/admin/groupmembers/delete", views.AdminGroupMemberDeleteHandler)
+	mux.HandleFunc("/admin/crudgroup", views.AdminCRUDGroupHandler)
 
 	if *fcgiMode {
 		fcgi.Serve(nil, mux)

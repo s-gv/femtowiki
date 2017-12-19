@@ -53,7 +53,7 @@ var SignupHandler = UA(func(w http.ResponseWriter, r *http.Request, ctx *Context
 		passwd2 := r.PostFormValue("passwd2")
 
 		if ctx.IsAdmin || !ctx.Config.SignupDisabled {
-			if err := models.ValidateUsername(username); err == nil {
+			if err := models.ValidateName(username); err == nil {
 				if passwd == passwd2 {
 					if err := models.ValidatePasswd(passwd); err == nil {
 						if err := models.CreateUser(username, passwd, "", false); err == nil {
