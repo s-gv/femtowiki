@@ -27,6 +27,10 @@ const baseSrc = `<!DOCTYPE html>
 		<div id="content">
 			{{ if .ctx.IsUserValid }}
 			<div id="section-profile">
+				{{ if .ctx.IsPageCRUDMember }}
+				<span class="section-profile-link"><a href="/files">Files</a></span>
+				<span class="section-profile-link"><a href="/pages">Pages</a></span>
+				{{ end }}
 				<span class="section-profile-link">
 					<a href="/profile?u={{ .ctx.UserName }}">{{ .ctx.UserName }}</a>
 					{{ if .ctx.IsAdmin }}(<a href="/admin">admin</a>){{ end }}
@@ -35,6 +39,7 @@ const baseSrc = `<!DOCTYPE html>
 			</div>
 			{{ else }}
 			<div id="section-profile">
+
 				<span class="section-profile-link"><a href="/signup">Signup</a></span>
 				<span class="section-profile-link"><a href="/login">Login</a></div></span>
 			{{ end }}
