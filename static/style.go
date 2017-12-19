@@ -22,6 +22,10 @@ body {
 	margin-bottom: 50px;
 	background-color: #f6f6f6;
 }
+textarea {
+	font-family: "Lucida Console", Monaco, monospace;
+	font-size: small;
+}
 .clearfix {
 	overflow: auto;
 	zoom: 1;

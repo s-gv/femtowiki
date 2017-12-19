@@ -13,6 +13,7 @@ import (
 	"html/template"
 	"github.com/s-gv/femtowiki/models/db"
 	"github.com/s-gv/femtowiki/models"
+	"strings"
 )
 
 var LoginHandler = UA(func(w http.ResponseWriter, r *http.Request, ctx *Context) {
@@ -137,16 +138,19 @@ var ForgotpassHandler = UA(func(w http.ResponseWriter, r *http.Request, ctx *Con
 		row := db.QueryRow(`SELECT email FROM users WHERE username=?;`, username)
 		var email string
 		if err := row.Scan(&email); err == nil {
-			resetToken := randSeq(40)
-			db.Exec(`UPDATE users SET reset_token=?, reset_token_date=? WHERE username=?;`, resetToken, int64(time.Now().Unix()), username)
+			if strings.Contains(email, "@") {
+				resetToken := randSeq(40)
+				db.Exec(`UPDATE users SET reset_token=?, reset_token_date=? WHERE username=?;`, resetToken, int64(time.Now().Unix()), username)
+				resetLink := "https://" + r.Host + "/resetpass?token=" + resetToken
+				sub := ctx.Config.WikiName + " Password Recovery"
+				msg := "Someone (hopefully you) requested we reset your password at " + ctx.Config.WikiName + ".\r\n" +
+					"If you want to change it, visit "+resetLink+"\r\n\r\nIf not, just ignore this message."
 
-			resetLink := "https://" + r.Host + "/resetpass?r=" + resetToken
-			sub := ctx.Config.WikiName + " Password Recovery"
-			msg := "Someone (hopefully you) requested we reset your password at " + ctx.Config.WikiName + ".\r\n" +
-				"If you want to change it, visit "+resetLink+"\r\n\r\nIf not, just ignore this message."
-
-			SendMail(email, sub, msg, ctx.Config)
-			ctx.FlashMsg = "Password reset link has been sent to your email"
+				SendMail(email, sub, msg, ctx.Config)
+				ctx.FlashMsg = "Password reset link has been sent to your email"
+			} else {
+				ctx.FlashMsg = "We don't have your email. Please contact the admin to reset your password"
+			}
 		} else {
 			ctx.FlashMsg = "User not found"
 		}
@@ -158,25 +162,27 @@ var ForgotpassHandler = UA(func(w http.ResponseWriter, r *http.Request, ctx *Con
 
 var ResetpassHandler = UA(func(w http.ResponseWriter, r *http.Request, ctx *Context) {
 	resetToken := r.FormValue("token")
-	if r.Method == "POST" {
-		row := db.QueryRow(`SELECT username, reset_token, reset_token_date FROM users WHERE reset_token=?;`, resetToken)
-		var username string
-		var rDate int64
-		if err := row.Scan(&username, &rDate); err != nil {
-			ErrNotFoundHandler(w, r)
-			return
-		}
-		resetTokenDate := time.Unix(rDate, 0)
-		if resetTokenDate.Before(time.Now().Add(-100*time.Hour)) {
-			ErrNotFoundHandler(w, r)
-			return
-		}
 
+	row := db.QueryRow(`SELECT username, reset_token_date FROM users WHERE reset_token=?;`, resetToken)
+	var username string
+	var rDate int64
+	if err := row.Scan(&username, &rDate); err != nil {
+		ErrNotFoundHandler(w, r)
+		return
+	}
+	resetTokenDate := time.Unix(rDate, 0)
+	if resetTokenDate.Before(time.Now().Add(-100*time.Hour)) {
+		ErrNotFoundHandler(w, r)
+		return
+	}
+
+	if r.Method == "POST" {
 		passwd := r.PostFormValue("passwd")
 		passwd2 := r.PostFormValue("passwd2")
 		if passwd == passwd2 {
 			if err := models.ValidatePasswd(passwd); err == nil {
 				models.UpdateUserPasswd(username, passwd)
+				db.Exec(`UPDATE users SET reset_token_date=0 WHERE username=?;`, username)
 				http.Redirect(w, r, "/login", http.StatusSeeOther)
 				return
 			} else {
