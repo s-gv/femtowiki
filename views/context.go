@@ -16,16 +16,17 @@ import (
 )
 
 type Context struct {
-	SessionID   string
-	UserName    string
-	IsUserValid bool
-	IsAdmin     bool
-	CSRFToken   string
-	FlashMsg    string
-	Config		WikiConfig
-	HeaderLinks []NavLink
-	FooterLinks []NavLink
-	NavSections []NavSection
+	SessionID        string
+	UserName         string
+	IsUserValid      bool
+	IsAdmin          bool
+	CSRFToken        string
+	FlashMsg         string
+	IsPageCRUDMember bool
+	Config		     WikiConfig
+	HeaderLinks      []NavLink
+	FooterLinks      []NavLink
+	NavSections      []NavSection
 }
 
 type WikiConfig struct {
@@ -75,12 +76,18 @@ func ReadContext(sessionID string) Context {
 					db.Exec(`UPDATE sessions SET updated_date=? WHERE sessionid=?;`, tNow, sessionID)
 				}
 				db.Exec(`UPDATE sessions SET msg=? WHERE sessionid=?;`, "", sessionID)
+
 				ctx.SessionID = sessionID
 				ctx.FlashMsg = flashmsg
 				ctx.UserName = username
 				ctx.IsAdmin = isAdmin
 				ctx.IsUserValid = true
 				ctx.CSRFToken = csrftoken
+
+				CRUDGroup := models.ReadCRUDGroup()
+				row := db.QueryRow(`SELECT groupmembers.id FROM groupmembers INNER JOIN groups ON groups.id=groupmembers.groupid AND groups.name=? INNER JOIN users ON users.id=groupmembers.userid AND users.username=?;`, CRUDGroup, ctx.UserName)
+				var tmp string
+				ctx.IsPageCRUDMember = ctx.IsAdmin || (CRUDGroup == models.EverybodyGroup) || (row.Scan(&tmp) == nil)
 			} else {
 				// Session expired
 				//log.Printf("[INFO] Attempted to use expired session (id: %s)\n", sessionID)
