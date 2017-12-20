@@ -164,6 +164,8 @@ func main() {
 	mux.HandleFunc("/admin/groupmembers/delete", views.AdminGroupMemberDeleteHandler)
 	mux.HandleFunc("/admin/crudgroup", views.AdminCRUDGroupHandler)
 
+	mux.HandleFunc("/pages/", views.PagesHandler)
+
 	if *fcgiMode {
 		fcgi.Serve(nil, mux)
 		return

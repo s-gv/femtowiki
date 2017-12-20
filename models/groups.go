@@ -7,6 +7,7 @@ package models
 import (
 	"database/sql"
 	"github.com/s-gv/femtowiki/models/db"
+	"errors"
 )
 
 var (
@@ -20,4 +21,19 @@ func ReadCRUDGroup() string {
 		CRUDGroup = DefaultCRUDGroup
 	}
 	return CRUDGroup
+}
+
+func IsUserInCRUDGroup(username string) error {
+	if username != "" {
+		CRUDGroup := ReadCRUDGroup()
+		if CRUDGroup == DefaultCRUDGroup {
+			return nil
+		}
+		row := db.QueryRow(`SELECT groupmembers.id FROM groupmembers INNER JOIN groups ON groups.id=groupmembers.groupid AND groups.name=? INNER JOIN users ON users.id=groupmembers.userid AND users.username=?;`, CRUDGroup, username)
+		var tmp string
+		if row.Scan(&tmp) == nil {
+			return nil
+		}
+	}
+	return errors.New("Access denied.")
 }

@@ -42,6 +42,12 @@ func init() {
 
 	tmpls["admingroupmembers.html"] = template.Must(template.New("base").Parse(baseSrc))
 	template.Must(tmpls["admingroupmembers.html"].New("admingroupmembers").Parse(adminGroupMembersSrc))
+
+	tmpls["accessdenied.html"] = template.Must(template.New("base").Parse(baseSrc))
+	template.Must(tmpls["accessdenied.html"].New("accessdenied").Parse(accessDeniedSrc))
+
+	tmpls["pagelist.html"] = template.Must(template.New("base").Parse(baseSrc))
+	template.Must(tmpls["pagelist.html"].New("pagelist").Parse(pageListSrc))
 }
 
 func Render(wr io.Writer, template string, data interface{}) {
