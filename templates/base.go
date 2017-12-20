@@ -28,8 +28,8 @@ const baseSrc = `<!DOCTYPE html>
 			{{ if .ctx.IsUserValid }}
 			<div id="section-profile">
 				{{ if .ctx.IsPageCRUDMember }}
-				<span class="section-profile-link"><a href="/files">Files</a></span>
-				<span class="section-profile-link"><a href="/pages">Pages</a></span>
+				<span class="section-profile-link"><a href="/files/">Files</a></span>
+				<span class="section-profile-link"><a href="/pages/">Pages</a></span>
 				{{ end }}
 				<span class="section-profile-link">
 					<a href="/profile?u={{ .ctx.UserName }}">{{ .ctx.UserName }}</a>
