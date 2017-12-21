@@ -6,12 +6,15 @@ package views
 
 import (
 	"net/http"
+	"gopkg.in/russross/blackfriday.v2"
+	"github.com/microcosm-cc/bluemonday"
 	"github.com/s-gv/femtowiki/templates"
 	"strings"
 	"github.com/s-gv/femtowiki/models"
 	"github.com/s-gv/femtowiki/models/db"
 	"database/sql"
 	"time"
+	"html/template"
 )
 
 var PagesHandler = UA(func(w http.ResponseWriter, r *http.Request, ctx *Context) {
@@ -51,12 +54,14 @@ var PagesHandler = UA(func(w http.ResponseWriter, r *http.Request, ctx *Context)
 		ErrNotFoundHandler(w, r)
 		return
 	}
+	unsafe := blackfriday.Run([]byte(strings.Replace(content, "\r\n", "\n", -1)))
+	html := string(bluemonday.UGCPolicy().SanitizeBytes(unsafe))
 	templates.Render(w, "index.html", map[string]interface{}{
 		"ctx": ctx,
-		"title": title,
+		"Title": title,
 		"URL": "/pages/"+cTitle,
 		"EditURL": "/editpage?t="+cTitle,
-		"content": content,
+		"Content": template.HTML(html),
 	})
 })
 
@@ -72,6 +77,11 @@ var PageCreateHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *Cont
 	var tmp string
 	if db.QueryRow(`SELECT id FROM pages WHERE title=?;`, title).Scan(&tmp) != sql.ErrNoRows {
 		ctx.SetFlashMsg("Page already exists")
+		http.Redirect(w, r, "/pages/#flash", http.StatusSeeOther)
+		return
+	}
+	if len(title) < 2 || len(title) > 200 {
+		ctx.SetFlashMsg("Title should have 2-200 characters")
 		http.Redirect(w, r, "/pages/#flash", http.StatusSeeOther)
 		return
 	}
@@ -96,7 +106,8 @@ var PageCreateHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *Cont
 })
 
 var PageEditHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *Context) {
-	if !ctx.IsAdmin && models.IsUserInCRUDGroup(ctx.UserName) != nil {
+	isCRUDGroupMember := (models.IsUserInCRUDGroup(ctx.UserName) == nil)
+	if !isCRUDGroupMember {
 		templates.Render(w, "accessdenied.html", map[string]interface{}{
 			"ctx": ctx,
 		})
@@ -105,6 +116,16 @@ var PageEditHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *Contex
 	cTitle := r.FormValue("t")
 	title := strings.Replace(cTitle, "_", " ", -1)
 	if r.Method == "POST" {
+		action := r.PostFormValue("action")
+		if action == "Update" {
+			content := r.PostFormValue("content")
+			db.Exec(`UPDATE pages SET content=? WHERE title=?;`, content, title)
+		}
+		if action == "Delete" {
+			db.Exec(`DELETE FROM pages WHERE title=?;`, title)
+			http.Redirect(w, r, "/pages/", http.StatusSeeOther)
+			return
+		}
 		http.Redirect(w, r, "/pages/"+cTitle, http.StatusSeeOther)
 		return
 	}
@@ -117,24 +138,10 @@ var PageEditHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *Contex
 	templates.Render(w, "index.html", map[string]interface{}{
 		"ctx": ctx,
 		"IsEditMode": true,
+		"IsCRUDGroupMember": isCRUDGroupMember,
 		"URL": "/pages/"+cTitle,
 		"EditURL": "/editpage?t="+cTitle,
-		"title": title,
-		"content": content,
+		"Title": title,
+		"Content": content,
 	})
-})
-
-var PageDeleteHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *Context) {
-	if !ctx.IsAdmin && models.IsUserInCRUDGroup(ctx.UserName) != nil {
-		templates.Render(w, "accessdenied.html", map[string]interface{}{
-			"ctx": ctx,
-		})
-		return
-	}
-	if r.Method != "POST" {
-		ErrForbiddenHandler(w, r)
-	}
-	title := r.FormValue("t")
-	db.Exec(`DELETE FROM pages WHERE title=?;`, title)
-	http.Redirect(w, r, "/pages/", http.StatusSeeOther)
 })

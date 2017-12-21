@@ -167,7 +167,6 @@ func main() {
 	mux.HandleFunc("/pages/", views.PagesHandler)
 	mux.HandleFunc("/newpage", views.PageCreateHandler)
 	mux.HandleFunc("/editpage", views.PageEditHandler)
-	mux.HandleFunc("/deletepage", views.PageDeleteHandler)
 
 	if *fcgiMode {
 		fcgi.Serve(nil, mux)
