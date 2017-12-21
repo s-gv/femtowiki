@@ -39,7 +39,6 @@ const baseSrc = `<!DOCTYPE html>
 			</div>
 			{{ else }}
 			<div id="section-profile">
-
 				<span class="section-profile-link"><a href="/signup">Signup</a></span>
 				<span class="section-profile-link"><a href="/login">Login</a></div></span>
 			{{ end }}
