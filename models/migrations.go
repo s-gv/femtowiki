@@ -7,6 +7,7 @@ package models
 import (
 	"github.com/s-gv/femtowiki/models/db"
 	"log"
+	"time"
 )
 
 const ModelVersion = 1
@@ -114,6 +115,7 @@ func Migrate() {
 			WriteConfig(NavSections, DefaultNavSections)
 			WriteConfig(IllegalNames, DefaultIllegalNames)
 			WriteConfig(CRUDGroup, DefaultCRUDGroup)
+			db.Exec(`INSERT INTO pages(title, content, created_date, updated_date) VALUES(?, ?, ?, ?);`, "Home Page", "# Home Page", time.Now().Unix(), time.Now().Unix())
 		}
 		dbver = db.Version()
 	}

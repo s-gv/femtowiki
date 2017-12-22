@@ -128,7 +128,7 @@ func main() {
 
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("/", views.IndexHandler)
+	mux.HandleFunc("/", views.PagesHandler)
 
 	mux.HandleFunc("/static/css/femtowiki.css", views.StyleHandler)
 

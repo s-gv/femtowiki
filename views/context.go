@@ -23,6 +23,7 @@ type Context struct {
 	CSRFToken        string
 	FlashMsg         string
 	IsPageCRUDMember bool
+	PageTitle		 string
 	Config		     WikiConfig
 	HeaderLinks      []NavLink
 	FooterLinks      []NavLink

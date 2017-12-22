@@ -26,11 +26,20 @@ func init() {
 }
 
 var PagesHandler = UA(func(w http.ResponseWriter, r *http.Request, ctx *Context) {
-	cTitle := r.URL.Path[7:] // r.URL will be /pages/<page_title>
-	title := strings.Replace(cTitle, "_", " ", -1)
+	isCRUDGroupMember := (models.IsUserInCRUDGroup(ctx.UserName) == nil)
+	cTitle := "Home_Page"
+	title := "Home Page"
+	if r.URL.Path != "/" {
+		cTitle = r.URL.Path[7:] // r.URL will be /pages/<page_title>
+		title = strings.Replace(cTitle, "_", " ", -1)
+		if title == "Home Page" {
+			http.Redirect(w, r, "/", http.StatusSeeOther)
+			return
+		}
+	}
 	if title == "" {
 		// List all pages
-		if !ctx.IsAdmin && models.IsUserInCRUDGroup(ctx.UserName) != nil {
+		if !ctx.IsAdmin && !isCRUDGroupMember {
 			templates.Render(w, "accessdenied.html", map[string]interface{}{
 				"ctx": ctx,
 			})
@@ -56,11 +65,22 @@ var PagesHandler = UA(func(w http.ResponseWriter, r *http.Request, ctx *Context)
 		return
 	}
 	// Render the relevant wiki page
-	row := db.QueryRow(`SELECT content FROM pages WHERE title=?;`, title)
+	row := db.QueryRow(`SELECT readgroupid, content FROM pages WHERE title=?;`, title)
 	var content string
-	if row.Scan(&content) != nil {
+	var readGroupID sql.NullString
+	if row.Scan(&readGroupID, &content) != nil {
 		ErrNotFoundHandler(w, r)
 		return
+	}
+	if !ctx.IsAdmin && !isCRUDGroupMember && readGroupID.Valid {
+		row := db.QueryRow(`SELECT groupmembers.id FROM groupmembers INNER JOIN users ON users.id=groupmembers.userid AND users.username=? WHERE groupmembers.groupid=?;`, ctx.UserName, readGroupID)
+		var tmp string
+		if row.Scan(&tmp) != nil {
+			templates.Render(w, "accessdenied.html", map[string]interface{}{
+				"ctx": ctx,
+			})
+			return
+		}
 	}
 	unsafe := blackfriday.Run([]byte(strings.Replace(content, "\r\n", "\n", -1)))
 	html := string(bluemonday.UGCPolicy().SanitizeBytes(unsafe))
@@ -110,6 +130,9 @@ var PagesHandler = UA(func(w http.ResponseWriter, r *http.Request, ctx *Context)
 	}
 	tocHTML += "\n</ol></div>"
 	html = strings.Replace(html, "<p><strong>TOC</strong></p>", tocHTML, 1)
+	if r.URL.Path != "" {
+		ctx.PageTitle = title
+	}
 	templates.Render(w, "index.html", map[string]interface{}{
 		"ctx": ctx,
 		"Title": title,
@@ -121,7 +144,12 @@ var PagesHandler = UA(func(w http.ResponseWriter, r *http.Request, ctx *Context)
 })
 
 var PageCreateHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *Context) {
-	if !ctx.IsAdmin && models.IsUserInCRUDGroup(ctx.UserName) != nil {
+	if r.Method != "POST" {
+		ErrForbiddenHandler(w, r)
+		return
+	}
+	isCRUDGroupMember := (models.IsUserInCRUDGroup(ctx.UserName) == nil)
+	if !ctx.IsAdmin && !isCRUDGroupMember {
 		templates.Render(w, "accessdenied.html", map[string]interface{}{
 			"ctx": ctx,
 		})
@@ -162,14 +190,21 @@ var PageCreateHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *Cont
 
 var PageEditHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *Context) {
 	isCRUDGroupMember := (models.IsUserInCRUDGroup(ctx.UserName) == nil)
-	if !isCRUDGroupMember {
-		templates.Render(w, "accessdenied.html", map[string]interface{}{
-			"ctx": ctx,
-		})
-		return
-	}
 	cTitle := r.FormValue("t")
 	title := strings.Replace(cTitle, "_", " ", -1)
+
+	var editGroupID sql.NullString
+	db.QueryRow(`SELECT editGroupID FROM pages WHERE title=?;`, title).Scan(&editGroupID)
+	if !ctx.IsAdmin && !isCRUDGroupMember && editGroupID.Valid {
+		var tmp string
+		row := db.QueryRow(`SELECT groupmembers.id FROM groupmembers INNER JOIN users ON users.id=groupmembers.userid AND users.username=? WHERE groupmembers.groupid=?;`, ctx.UserName, editGroupID)
+		if row.Scan(&tmp) != nil {
+			templates.Render(w, "accessdenied.html", map[string]interface{}{
+				"ctx": ctx,
+			})
+			return
+		}
+	}
 	if r.Method == "POST" {
 		action := r.PostFormValue("action")
 		if action == "Update" {
@@ -177,6 +212,12 @@ var PageEditHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *Contex
 			db.Exec(`UPDATE pages SET content=? WHERE title=?;`, content, title)
 		}
 		if action == "Delete" {
+			if !ctx.IsAdmin && !isCRUDGroupMember {
+				templates.Render(w, "accessdenied.html", map[string]interface{}{
+					"ctx": ctx,
+				})
+				return
+			}
 			db.Exec(`DELETE FROM pages WHERE title=?;`, title)
 			http.Redirect(w, r, "/pages/", http.StatusSeeOther)
 			return

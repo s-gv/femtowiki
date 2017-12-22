@@ -12,7 +12,7 @@ const baseSrc = `<!DOCTYPE html>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" type="text/css" href="/static/css/femtowiki.css?v=010">
 	<title>
-		{{ .ctx.Config.WikiName }}
+		{{ if .ctx.PageTitle }}{{ .ctx.PageTitle }}{{ else }}{{ .ctx.Config.WikiName }}{{ end }}
 	</title>
 	{{ block "head" . }}{{ end }}
 </head>
