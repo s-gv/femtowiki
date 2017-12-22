@@ -66,13 +66,12 @@ func Migration1() {
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		title VARCHAR(250) DEFAULT '',
 		content TEXT DEFAULT '',
-		version INTEGER DEFAULT 0,
 		editgroupid INTEGER REFERENCES groups(id) ON DELETE SET NULL,
 		readgroupid INTEGER REFERENCES groups(id) ON DELETE SET NULL,
 		created_date INTEGER DEFAULT 0,
 		updated_date INTEGER DEFAULT 0
 	);`)
-	db.Exec(`CREATE INDEX pages_title_version_index on pages(title, version DESC);`)
+	db.Exec(`CREATE INDEX pages_title_index on pages(title);`)
 	db.Exec(`CREATE INDEX pages_editgroupid_index on pages(editgroupid);`)
 	db.Exec(`CREATE INDEX pages_readgroupid_index on pages(readgroupid);`)
 
@@ -80,13 +79,12 @@ func Migration1() {
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		name VARCHAR(250) DEFAULT '',
 		location VARCHAR(250) DEFAULT '',
-		version INTEGER DEFAULT 0,
 		editgroupid INTEGER REFERENCES groups(id) ON DELETE SET NULL,
 		readgroupid INTEGER REFERENCES groups(id) ON DELETE SET NULL,
 		created_date INTEGER DEFAULT 0,
 		updated_date INTEGER DEFAULT 0
 	);`)
-	db.Exec(`CREATE INDEX uploads_name_version_index on uploads(name, version DESC);`)
+	db.Exec(`CREATE INDEX uploads_name_index on uploads(name);`)
 	db.Exec(`CREATE INDEX uploads_editgroupid_index on uploads(editgroupid);`)
 	db.Exec(`CREATE INDEX uploads_readgroupid_index on uploads(readgroupid);`)
 	// db.Exec(`CREATE VIRTUAL TABLE email USING fts5(sender, title, body);`)
