@@ -66,6 +66,7 @@ func Migration1() {
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		title VARCHAR(250) DEFAULT '',
 		content TEXT DEFAULT '',
+		discussion TEXT DEFAULT '',
 		editgroupid INTEGER REFERENCES groups(id) ON DELETE SET NULL,
 		readgroupid INTEGER REFERENCES groups(id) ON DELETE SET NULL,
 		created_date INTEGER DEFAULT 0,
