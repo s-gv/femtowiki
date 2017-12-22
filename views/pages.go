@@ -15,7 +15,15 @@ import (
 	"database/sql"
 	"time"
 	"html/template"
+	"regexp"
+	"encoding/base64"
 )
+
+var headerRe *regexp.Regexp
+
+func init() {
+	headerRe = regexp.MustCompile("<h[2-9]>.+?</h[2-9]>")
+}
 
 var PagesHandler = UA(func(w http.ResponseWriter, r *http.Request, ctx *Context) {
 	cTitle := r.URL.Path[7:] // r.URL will be /pages/<page_title>
@@ -56,9 +64,56 @@ var PagesHandler = UA(func(w http.ResponseWriter, r *http.Request, ctx *Context)
 	}
 	unsafe := blackfriday.Run([]byte(strings.Replace(content, "\r\n", "\n", -1)))
 	html := string(bluemonday.UGCPolicy().SanitizeBytes(unsafe))
+
+	type Link struct {
+		name string
+		URL string
+	}
+	type TOCItem struct {
+		title Link
+		subtitles []Link
+	}
+	var toc []TOCItem
+	html = headerRe.ReplaceAllStringFunc(html, func(h string) string {
+		n := string(h[2])
+		if n == "2" || n == "3" {
+			if len(h) >= 10 {
+				t := h[4:len(h)-5]
+				id := "m-"+n+"-"+base64.StdEncoding.EncodeToString([]byte(t))
+				link := Link{t, "#"+id}
+				if n == "2" {
+					var tocItem TOCItem
+					tocItem.title = link
+					toc = append(toc, tocItem)
+				}
+				if n == "3" {
+					if len(toc) > 0 {
+						toc[len(toc)-1].subtitles = append(toc[len(toc)-1].subtitles, link)
+					}
+				}
+				return "<h"+n+" id=\""+id+"\">" + t + "</h"+n+">"
+			}
+		}
+		return h
+	})
+	tocHTML := "<div class=\"toc\"><ol>\n"
+	for _, t := range toc {
+		tocHTML += "<li><a href=\""+t.title.URL+"\">"+t.title.name+"</a>"
+		if len(t.subtitles) > 0 {
+			tocHTML += "<ul>"
+			for _, s:= range t.subtitles {
+				tocHTML += "<li><a href=\""+s.URL+"\">"+s.name+"</a>"
+			}
+			tocHTML += "</ul>"
+		}
+		tocHTML += "</li>"
+	}
+	tocHTML += "\n</ol></div>"
+	html = strings.Replace(html, "<p><strong>TOC</strong></p>", tocHTML, 1)
 	templates.Render(w, "index.html", map[string]interface{}{
 		"ctx": ctx,
 		"Title": title,
+		"cTitle": cTitle,
 		"URL": "/pages/"+cTitle,
 		"EditURL": "/editpage?t="+cTitle,
 		"Content": template.HTML(html),
@@ -92,7 +147,7 @@ var PageCreateHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *Cont
 			return
 		}
 	}
-	content := "#"+title
+	content := "# "+title
 	tNow := time.Now().Unix()
 	db.Exec(`INSERT INTO pages(title, content, created_date, updated_date) VALUES(?, ?, ?, ?);`, title, content, tNow, tNow)
 	CRUDGroup := models.ReadCRUDGroup()
@@ -142,6 +197,7 @@ var PageEditHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *Contex
 		"URL": "/pages/"+cTitle,
 		"EditURL": "/editpage?t="+cTitle,
 		"Title": title,
+		"cTitle": cTitle,
 		"Content": content,
 	})
 })

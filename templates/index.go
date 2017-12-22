@@ -31,7 +31,7 @@ const indexSrc = `
 {{ if .IsEditMode }}
 	<form action="/editpage" method="POST">
 		<input type="hidden" name="csrf" value="{{ .ctx.CSRFToken }}">
-		<input type="hidden" name="t" value="{{ .Title }}">
+		<input type="hidden" name="t" value="{{ .cTitle }}">
 		<textarea rows="50" name="content">{{ .Content }}</textarea>
 		<input type="submit" class="btn btn-default" name="action" value="Update">
 		{{ if .IsCRUDGroupMember }}
@@ -39,22 +39,6 @@ const indexSrc = `
 		{{ end }}
 	</form>
 {{ else }}
-	<h1>{{ .Title }}</h1>
-
-	<div class="toc">
-	<ol>
-	<li><a href="">Truncate the results</a></li>
-	<li>
-		<a href="">Legal</a>
-		<ul>
-			<li><a href="">Jane vs. Roe</a></li>
-			<li><a href="">Jon vs. Jane</a></li>
-			<li><a href="">Wade vs. Roe</a></li>
-		</ul>
-	</li>
-	<li><a href="">Variations</a></li>
-	</ol>
-	</div>
 	{{ .Content }}
 {{ end }}
 </div>
