@@ -67,6 +67,7 @@ func Migration1() {
 		title VARCHAR(250) DEFAULT '',
 		content TEXT DEFAULT '',
 		discussion TEXT DEFAULT '',
+		is_file INTEGER DEFAULT 0,
 		editgroupid INTEGER REFERENCES groups(id) ON DELETE SET NULL,
 		readgroupid INTEGER REFERENCES groups(id) ON DELETE SET NULL,
 		created_date INTEGER DEFAULT 0,

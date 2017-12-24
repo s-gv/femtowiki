@@ -53,7 +53,7 @@ var PagesHandler = UA(func(w http.ResponseWriter, r *http.Request, ctx *Context)
 			EditGroup string
 		}
 		pages := []Page{}
-		rows := db.Query(`SELECT title, readgroupid, editgroupid FROM pages ORDER BY title;`)
+		rows := db.Query(`SELECT title, readgroupid, editgroupid FROM pages WHERE is_file=? ORDER BY title;`, false)
 		for rows.Next() {
 			page := Page{}
 			var readGroupID, editGroupID sql.NullString
@@ -234,6 +234,7 @@ var PageEditHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *Contex
 					} else {
 						db.Exec(`UPDATE pages SET readgroupid=NULL WHERE title=?;`, title)
 					}
+					ctx.SetFlashMsg("Updated post " + title)
 				}
 			}
 			if action == "Delete" {
@@ -243,6 +244,7 @@ var PageEditHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *Contex
 					})
 					return
 				}
+				ctx.SetFlashMsg("Deleted post " + title)
 				db.Exec(`DELETE FROM pages WHERE title=?;`, title)
 			}
 			http.Redirect(w, r, "/pages/", http.StatusSeeOther)

@@ -168,6 +168,10 @@ func main() {
 	mux.HandleFunc("/newpage", views.PageCreateHandler)
 	mux.HandleFunc("/editpage", views.PageEditHandler)
 
+	mux.HandleFunc("/files/", views.FilesHandler)
+	mux.HandleFunc("/newfile", views.FileCreateHandler)
+	mux.HandleFunc("/editfile", views.FileUpdateHandler)
+
 	if *fcgiMode {
 		fcgi.Serve(nil, mux)
 		return

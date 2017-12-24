@@ -4,30 +4,25 @@
 
 package templates
 
-var pageListSrc = `
+var fileListSrc = `
 {{ define "content" }}
-<h1>Pages</h1>
+<h1>Files</h1>
 <div class="table">
 	<div class="trow">
-		<div class="tcol3"><strong>Title</strong></div>
+		<div class="tcol3"><strong>Name</strong></div>
 		<div class="tcol6"><strong>Read Group</strong></div>
-		<div class="tcol6"><strong>Edit Group</strong></div>
 	</div>
-	{{ if .pages }}
-	{{ range .pages }}
+	{{ if .files }}
+	{{ range .files }}
 	<div class="trow">
-		<form action="/editpage" method="POST">
+		<form action="/editfile" method="POST">
 			<input type="hidden" name="csrf" value="{{ $.ctx.CSRFToken }}">
 			<input type="hidden" name="t" value="{{ .CTitle }}">
-			<input type="hidden" name="meta" value="true">
 			<div class="tcol3">
-				<a href="/pages/{{ .CTitle }}">{{ .Title }}</a>
+				<a href="/files/{{ .CTitle }}">{{ .Title }}</a>
 			</div>
 			<div class="tcol6">
 				<input type="text" class="form-control" name="readgroup" value="{{ .ReadGroup }}"{{ if not $.ctx.IsAdmin}} disabled{{ end }}>
-			</div>
-			<div class="tcol6">
-				<input type="text" class="form-control" name="editgroup" value="{{ .EditGroup }}"{{ if not $.ctx.IsAdmin}} disabled{{ end }}>
 			</div>
 			<div class="tcol6">
 				<input type="submit" class="btn btn-default" name="action" value="Update"{{ if not $.ctx.IsAdmin}} disabled{{ end }}>
@@ -40,22 +35,22 @@ var pageListSrc = `
 	{{ end }}
 	<p>Note: Set the group column to blank to allow any user to perform the relevant action.</p>
 	{{ else }}
-	<p>No pages found.</p>
+	<p>No files found.</p>
 	{{ end }}
 </div>
-<h3>New page</h3>
+<h3>New file</h3>
 <div style="max-width: 300px;">
-	<form action="/newpage" method="POST">
+	<form action="/newfile" method="POST" enctype="multipart/form-data">
 		<input type="hidden" name="csrf" value="{{ .ctx.CSRFToken }}">
 		<div class="form-group">
-			<input type="text" class="form-control" name="title" placeholder="Page title">
+			<input type="file" class="form-control" name="file">
 		</div>
 		{{ if .ctx.FlashMsg }}
 		<div class="form-group" id="flash">
 			<span class="flash">{{ .ctx.FlashMsg }}</span>
 		</div>
 		{{ end }}
-		<input type="submit" class="btn btn-default" value="Create page">
+		<input type="submit" class="btn btn-default" value="Upload">
 	</form>
 </div>
 {{ end }}

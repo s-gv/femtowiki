@@ -23,6 +23,15 @@ func ReadCRUDGroup() string {
 	return CRUDGroup
 }
 
+func ReadFileMasterGroup() string {
+	fileMasterGroup := ReadConfig(FileMasterGroup)
+	var tmp string
+	if db.QueryRow(`SELECT id FROM groups WHERE name=?;`, FileMasterGroup).Scan(&tmp) == sql.ErrNoRows {
+		fileMasterGroup = DefaultFileMasterGroup
+	}
+	return fileMasterGroup
+}
+
 func IsUserInCRUDGroup(username string) error {
 	if username != "" {
 		CRUDGroup := ReadCRUDGroup()
@@ -36,4 +45,19 @@ func IsUserInCRUDGroup(username string) error {
 		}
 	}
 	return errors.New("Access denied.")
+}
+
+func IsUserInPageMasterGroup(username string) bool {
+	if username != "" {
+		fileMasterGroup := ReadFileMasterGroup()
+		if fileMasterGroup == EverybodyGroup {
+			return true
+		}
+		row := db.QueryRow(`SELECT groupmembers.id FROM groupmembers INNER JOIN groups ON groups.id=groupmembers.groupid AND groups.name=? INNER JOIN users ON users.id=groupmembers.userid AND users.username=?;`, fileMasterGroup, username)
+		var tmp string
+		if row.Scan(&tmp) == nil {
+			return true
+		}
+	}
+	return false
 }

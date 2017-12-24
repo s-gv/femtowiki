@@ -7,13 +7,14 @@ package models
 import "github.com/s-gv/femtowiki/models/db"
 
 const (
-	Version      = "version"
-	CRUDGroup    = "crud_group"
-	ConfigJSON   = "config_json"
-	HeaderLinks  = "header_links"
-	FooterLinks  = "footer_links"
-	NavSections  = "nav_sections"
-	IllegalNames = "illegal_names"
+	Version         = "version"
+	CRUDGroup       = "crud_group"
+	FileMasterGroup = "file_master_group"
+	ConfigJSON      = "config_json"
+	HeaderLinks     = "header_links"
+	FooterLinks     = "footer_links"
+	NavSections     = "nav_sections"
+	IllegalNames    = "illegal_names"
 )
 
 const (
@@ -28,6 +29,7 @@ const (
 	"FromEmail": ""
 }`
 	DefaultCRUDGroup = EverybodyGroup
+	DefaultFileMasterGroup = EverybodyGroup
 	DefaultHeaderLinks = `[
 	{"Title": "Home", "URL": "/"},
 	{"Title": "Download", "URL": "http://www.goodoldweb.com/"}

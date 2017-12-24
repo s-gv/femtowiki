@@ -48,6 +48,9 @@ func init() {
 
 	tmpls["pagelist.html"] = template.Must(template.New("base").Parse(baseSrc))
 	template.Must(tmpls["pagelist.html"].New("pagelist").Parse(pageListSrc))
+
+	tmpls["filelist.html"] = template.Must(template.New("base").Parse(baseSrc))
+	template.Must(tmpls["filelist.html"].New("filelist").Parse(fileListSrc))
 }
 
 func Render(wr io.Writer, template string, data interface{}) {
