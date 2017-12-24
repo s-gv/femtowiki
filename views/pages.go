@@ -32,7 +32,7 @@ var PagesHandler = UA(func(w http.ResponseWriter, r *http.Request, ctx *Context)
 	if r.URL.Path != "/" {
 		cTitle = r.URL.Path[7:] // r.URL will be /pages/<page_title>
 		title = strings.Replace(cTitle, "_", " ", -1)
-		if title == "Home Page" {
+		if title == models.IndexPage {
 			http.Redirect(w, r, "/", http.StatusSeeOther)
 			return
 		}
