@@ -27,12 +27,13 @@ func init() {
 
 var PagesHandler = UA(func(w http.ResponseWriter, r *http.Request, ctx *Context) {
 	isCRUDGroupMember := (models.IsUserInCRUDGroup(ctx.UserName) == nil)
-	cTitle := models.IndexPage
-	title := strings.Replace(cTitle, "_", " ", -1)
+	title := models.IndexPage
+	cTitle := strings.Replace(title, " ", "_", -1)
+	isDiscussion := (r.FormValue("d") != "")
 	if r.URL.Path != "/" {
 		cTitle = r.URL.Path[7:] // r.URL will be /pages/<page_title>
 		title = strings.Replace(cTitle, "_", " ", -1)
-		if title == models.IndexPage {
+		if title == models.IndexPage && !isDiscussion {
 			http.Redirect(w, r, "/", http.StatusSeeOther)
 			return
 		}
@@ -74,7 +75,12 @@ var PagesHandler = UA(func(w http.ResponseWriter, r *http.Request, ctx *Context)
 		return
 	}
 	// Render the relevant wiki page
-	row := db.QueryRow(`SELECT readgroupid, content FROM pages WHERE title=?;`, title)
+	var row *db.Row
+	if isDiscussion {
+		row = db.QueryRow(`SELECT readgroupid, discussion FROM pages WHERE title=?;`, title)
+	} else {
+		row = db.QueryRow(`SELECT readgroupid, content FROM pages WHERE title=?;`, title)
+	}
 	var content string
 	var readGroupID sql.NullString
 	if row.Scan(&readGroupID, &content) != nil {
@@ -142,12 +148,17 @@ var PagesHandler = UA(func(w http.ResponseWriter, r *http.Request, ctx *Context)
 	if r.URL.Path != "" {
 		ctx.PageTitle = title
 	}
+	editURL := "/editpage?t="+cTitle
+	if isDiscussion {
+		editURL += "&d=true"
+	}
 	templates.Render(w, "index.html", map[string]interface{}{
 		"ctx": ctx,
 		"Title": title,
 		"cTitle": cTitle,
+		"IsDiscussion": isDiscussion,
 		"URL": "/pages/"+cTitle,
-		"EditURL": "/editpage?t="+cTitle,
+		"EditURL": editURL,
 		"Content": template.HTML(html),
 	})
 })
@@ -179,7 +190,7 @@ var PageCreateHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *Cont
 	}
 	content := "# "+title
 	tNow := time.Now().Unix()
-	db.Exec(`INSERT INTO pages(title, content, created_date, updated_date) VALUES(?, ?, ?, ?);`, title, content, tNow, tNow)
+	db.Exec(`INSERT INTO pages(title, content, discussion, created_date, updated_date) VALUES(?, ?, ?, ?, ?);`, title, content, content, tNow, tNow)
 	CRUDGroup := models.ReadCRUDGroup()
 	if CRUDGroup != models.DefaultCRUDGroup {
 		var gID string
@@ -194,6 +205,7 @@ var PageEditHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *Contex
 	isCRUDGroupMember := (models.IsUserInCRUDGroup(ctx.UserName) == nil)
 	cTitle := r.FormValue("t")
 	title := strings.Replace(cTitle, "_", " ", -1)
+	isDiscussion := (r.FormValue("d") != "")
 
 	var editGroupID sql.NullString
 	db.QueryRow(`SELECT editGroupID FROM pages WHERE title=?;`, title).Scan(&editGroupID)
@@ -212,8 +224,14 @@ var PageEditHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *Contex
 		if r.PostFormValue("meta") == "" {
 			if action == "Update" {
 				content := r.PostFormValue("content")
-				db.Exec(`UPDATE pages SET content=? WHERE title=?;`, content, title)
-				http.Redirect(w, r, "/pages/"+cTitle, http.StatusSeeOther)
+				reURL := "/pages/"+cTitle
+				if isDiscussion {
+					db.Exec(`UPDATE pages SET discussion=? WHERE title=?;`, content, title)
+					reURL += "?d=true"
+				} else {
+					db.Exec(`UPDATE pages SET content=? WHERE title=?;`, content, title)
+				}
+				http.Redirect(w, r, reURL, http.StatusSeeOther)
 				return
 			}
 		} else {
@@ -251,11 +269,20 @@ var PageEditHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *Contex
 			return
 		}
 	}
-	row := db.QueryRow(`SELECT content FROM pages WHERE title=?;`, title)
+	var row *db.Row
+	if isDiscussion {
+		row = db.QueryRow(`SELECT discussion FROM pages WHERE title=?;`, title)
+	} else {
+		row = db.QueryRow(`SELECT content FROM pages WHERE title=?;`, title)
+	}
 	var content string
 	if row.Scan(&content) != nil {
 		ErrNotFoundHandler(w, r)
 		return
+	}
+	editURL := "/editpage?t="+cTitle
+	if isDiscussion {
+		editURL += "&d=true"
 	}
 	templates.Render(w, "index.html", map[string]interface{}{
 		"ctx": ctx,
@@ -264,6 +291,7 @@ var PageEditHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *Contex
 		"EditURL": "/editpage?t="+cTitle,
 		"Title": title,
 		"cTitle": cTitle,
+		"IsDiscussion": isDiscussion,
 		"Content": content,
 	})
 })

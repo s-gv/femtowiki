@@ -23,8 +23,8 @@ const indexSrc = `
 		{{ end }}
 	</div>
 	<div id="section-tabs-left">
-		<span class="active"><a href="">Main</a></span>
-		<span><a href="">Discussion</a></span>
+		<span{{ if not .IsDiscussion }} class="active"{{ end }}><a href="{{ .URL }}">Main</a></span>
+		<span{{ if .IsDiscussion }} class="active"{{ end }}><a href="{{ .URL }}?d=true">Discussion</a></span>
 	</div>
 </div>
 <div id="meat">
@@ -32,6 +32,7 @@ const indexSrc = `
 	<form action="/editpage" method="POST">
 		<input type="hidden" name="csrf" value="{{ .ctx.CSRFToken }}">
 		<input type="hidden" name="t" value="{{ .cTitle }}">
+		<input type="hidden" name="d" value="{{ if .IsDiscussion }}true{{ end }}">
 		<textarea rows="50" name="content">{{ .Content }}</textarea>
 		<input type="submit" class="btn btn-default" name="action" value="Update">
 	</form>
