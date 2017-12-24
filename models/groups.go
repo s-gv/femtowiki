@@ -10,7 +10,7 @@ import (
 	"errors"
 )
 
-var (
+const (
 	EverybodyGroup = "everybody"
 )
 
@@ -26,7 +26,7 @@ func ReadCRUDGroup() string {
 func IsUserInCRUDGroup(username string) error {
 	if username != "" {
 		CRUDGroup := ReadCRUDGroup()
-		if CRUDGroup == DefaultCRUDGroup {
+		if CRUDGroup == EverybodyGroup {
 			return nil
 		}
 		row := db.QueryRow(`SELECT groupmembers.id FROM groupmembers INNER JOIN groups ON groups.id=groupmembers.groupid AND groups.name=? INNER JOIN users ON users.id=groupmembers.userid AND users.username=?;`, CRUDGroup, username)

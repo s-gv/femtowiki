@@ -6,14 +6,41 @@ package templates
 
 var pageListSrc = `
 {{ define "content" }}
-<div class="form-container">
-	<h1>Pages</h1>
-	<ul>
-		{{ range .pages }}
-		<li><a href="{{ .URL }}">{{ .Title }}</a></li>
-		{{ end }}
-	</ul>
-	<h3>New page</h3>
+<h1>Pages</h1>
+<div class="table">
+	<div class="trow">
+		<div class="tcol3"><strong>Title</strong></div>
+		<div class="tcol6"><strong>Read Group</strong></div>
+		<div class="tcol6"><strong>Edit Group</strong></div>
+	</div>
+	{{ range .pages }}
+	<div class="trow">
+		<form action="/editpage" method="POST">
+			<input type="hidden" name="csrf" value="{{ $.ctx.CSRFToken }}">
+			<input type="hidden" name="t" value="{{ .CTitle }}">
+			<input type="hidden" name="meta" value="true">
+			<div class="tcol3">
+				<a href="/pages/{{ .CTitle }}">{{ .Title }}</a>
+			</div>
+			<div class="tcol6">
+				<input type="text" class="form-control" name="readgroup" value="{{ .ReadGroup }}"{{ if not $.ctx.IsAdmin}} disabled{{ end }}>
+			</div>
+			<div class="tcol6">
+				<input type="text" class="form-control" name="editgroup" value="{{ .EditGroup }}"{{ if not $.ctx.IsAdmin}} disabled{{ end }}>
+			</div>
+			<div class="tcol6">
+				<input type="submit" class="btn btn-default" name="action" value="Update"{{ if not $.ctx.IsAdmin}} disabled{{ end }}>
+			</div>
+			<div class="tcol6">
+				<input type="submit" class="btn btn-danger" name="action" value="Delete">
+			</div>
+		</form>
+	</div>
+	{{ end }}
+	<p>Note: Set the group column to blank to allow any registered user to perform the relevant action.</p>
+</div>
+<h3>New page</h3>
+<div style="max-width: 300px;">
 	<form action="/newpage" method="POST">
 		<input type="hidden" name="csrf" value="{{ .ctx.CSRFToken }}">
 		<div class="form-group">

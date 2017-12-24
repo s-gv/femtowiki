@@ -27,8 +27,8 @@ func init() {
 
 var PagesHandler = UA(func(w http.ResponseWriter, r *http.Request, ctx *Context) {
 	isCRUDGroupMember := (models.IsUserInCRUDGroup(ctx.UserName) == nil)
-	cTitle := "Home_Page"
-	title := "Home Page"
+	cTitle := models.IndexPage
+	title := strings.Replace(cTitle, "_", " ", -1)
 	if r.URL.Path != "/" {
 		cTitle = r.URL.Path[7:] // r.URL will be /pages/<page_title>
 		title = strings.Replace(cTitle, "_", " ", -1)
@@ -47,15 +47,24 @@ var PagesHandler = UA(func(w http.ResponseWriter, r *http.Request, ctx *Context)
 		}
 
 		type Page struct {
-			Title string
-			URL   string
+			Title     string
+			CTitle    string
+			ReadGroup string
+			EditGroup string
 		}
 		pages := []Page{}
-		rows := db.Query(`SELECT title FROM pages ORDER BY title;`)
+		rows := db.Query(`SELECT title, readgroupid, editgroupid FROM pages ORDER BY title;`)
 		for rows.Next() {
 			page := Page{}
-			rows.Scan(&page.Title)
-			page.URL = strings.Replace(page.Title, " ", "_", -1)
+			var readGroupID, editGroupID sql.NullString
+			rows.Scan(&page.Title, &readGroupID, &editGroupID)
+			page.CTitle = strings.Replace(page.Title, " ", "_", -1)
+			if readGroupID.Valid {
+				db.QueryRow(`SELECT name FROM groups WHERE id=?;`, readGroupID).Scan(&page.ReadGroup)
+			}
+			if editGroupID.Valid {
+				db.QueryRow(`SELECT name FROM groups WHERE id=?;`, editGroupID).Scan(&page.EditGroup)
+			}
 			pages = append(pages, page)
 		}
 		templates.Render(w, "pagelist.html", map[string]interface{}{
@@ -163,17 +172,10 @@ var PageCreateHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *Cont
 		http.Redirect(w, r, "/pages/#flash", http.StatusSeeOther)
 		return
 	}
-	if len(title) < 2 || len(title) > 200 {
-		ctx.SetFlashMsg("Title should have 2-200 characters")
+	if err := models.IsPageTitleValid(title); err != nil {
+		ctx.SetFlashMsg(err.Error())
 		http.Redirect(w, r, "/pages/#flash", http.StatusSeeOther)
 		return
-	}
-	for _, ch := range title {
-		if (ch < 'a' || ch > 'z') && (ch < 'A' || ch > 'Z') && (ch < '0' && ch > '9') &&(ch != ' ') {
-			ctx.SetFlashMsg("Only alphanumeric characters are supported in the title.")
-			http.Redirect(w, r, "/pages/#flash", http.StatusSeeOther)
-			return
-		}
 	}
 	content := "# "+title
 	tNow := time.Now().Unix()
@@ -207,23 +209,45 @@ var PageEditHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *Contex
 	}
 	if r.Method == "POST" {
 		action := r.PostFormValue("action")
-		if action == "Update" {
-			content := r.PostFormValue("content")
-			db.Exec(`UPDATE pages SET content=? WHERE title=?;`, content, title)
-		}
-		if action == "Delete" {
-			if !ctx.IsAdmin && !isCRUDGroupMember {
-				templates.Render(w, "accessdenied.html", map[string]interface{}{
-					"ctx": ctx,
-				})
+		if r.PostFormValue("meta") == "" {
+			if action == "Update" {
+				content := r.PostFormValue("content")
+				db.Exec(`UPDATE pages SET content=? WHERE title=?;`, content, title)
+				http.Redirect(w, r, "/pages/"+cTitle, http.StatusSeeOther)
 				return
 			}
-			db.Exec(`DELETE FROM pages WHERE title=?;`, title)
+		} else {
+			if action == "Update" {
+				if ctx.IsAdmin {
+					editGroup := r.PostFormValue("editgroup")
+					readGroup := r.PostFormValue("readgroup")
+					var editGroupID, readGroupID string
+					db.QueryRow(`SELECT id FROM groups WHERE name=?;`, editGroup).Scan(&editGroupID)
+					db.QueryRow(`SELECT id FROM groups WHERE name=?;`, readGroup).Scan(&readGroupID)
+					if editGroupID != "" {
+						db.Exec(`UPDATE pages SET editgroupid=? WHERE title=?;`, editGroupID, title)
+					} else {
+						db.Exec(`UPDATE pages SET editgroupid=NULL WHERE title=?;`, title)
+					}
+					if readGroupID != "" {
+						db.Exec(`UPDATE pages SET readgroupid=? WHERE title=?;`, readGroupID, title)
+					} else {
+						db.Exec(`UPDATE pages SET readgroupid=NULL WHERE title=?;`, title)
+					}
+				}
+			}
+			if action == "Delete" {
+				if !ctx.IsAdmin && !isCRUDGroupMember {
+					templates.Render(w, "accessdenied.html", map[string]interface{}{
+						"ctx": ctx,
+					})
+					return
+				}
+				db.Exec(`DELETE FROM pages WHERE title=?;`, title)
+			}
 			http.Redirect(w, r, "/pages/", http.StatusSeeOther)
 			return
 		}
-		http.Redirect(w, r, "/pages/"+cTitle, http.StatusSeeOther)
-		return
 	}
 	row := db.QueryRow(`SELECT content FROM pages WHERE title=?;`, title)
 	var content string
@@ -234,7 +258,6 @@ var PageEditHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *Contex
 	templates.Render(w, "index.html", map[string]interface{}{
 		"ctx": ctx,
 		"IsEditMode": true,
-		"IsCRUDGroupMember": isCRUDGroupMember,
 		"URL": "/pages/"+cTitle,
 		"EditURL": "/editpage?t="+cTitle,
 		"Title": title,

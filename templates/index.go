@@ -34,9 +34,6 @@ const indexSrc = `
 		<input type="hidden" name="t" value="{{ .cTitle }}">
 		<textarea rows="50" name="content">{{ .Content }}</textarea>
 		<input type="submit" class="btn btn-default" name="action" value="Update">
-		{{ if .IsCRUDGroupMember }}
-		<input type="submit" class="btn btn-danger" name="action" value="Delete" onclick="return confirm('Are you sure you want to delete this page?');">
-		{{ end }}
 	</form>
 {{ else }}
 	{{ .Content }}

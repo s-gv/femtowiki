@@ -19,7 +19,7 @@ const (
 const (
 	DefaultConfigJSON = `{
 	"WikiName": "Femtowiki",
-	"SignupDisabled": false,
+	"SignupDisabled": true,
 	"DataDir": "",
 	"SMTPHost": "",
 	"SMTPPort": "",
@@ -27,7 +27,7 @@ const (
 	"SMTPPasswd": "",
 	"FromEmail": ""
 }`
-	DefaultCRUDGroup = "everybody"
+	DefaultCRUDGroup = EverybodyGroup
 	DefaultHeaderLinks = `[
 	{"Title": "Home", "URL": "/"},
 	{"Title": "Download", "URL": "http://www.goodoldweb.com/"}

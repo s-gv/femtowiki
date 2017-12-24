@@ -73,6 +73,7 @@ a:visited {
 	padding: 0 10px;
 }
 #footer {
+	margin-top: 12px;
 	font-size: 12px;
 }
 #footer a {
@@ -282,5 +283,24 @@ textarea:focus, input[type="text"]:focus, input[type="password"]:focus, input[ty
 /* flash message */
 .flash {
 	color: red;
+}
+
+/* css table */
+.table {
+}
+.trow {
+	margin: 10px 0;
+}
+.tcol3 {
+	display: inline-block;
+	width: 30%;
+	max-width: 400px;
+	padding: 0 4px;
+}
+.tcol6 {
+	display: inline-block;
+	width: 15%;
+	max-width: 150px;
+	padding: 0 4px;
 }
 `
