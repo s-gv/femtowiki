@@ -9,16 +9,16 @@ import (
 	"github.com/s-gv/femtowiki/templates"
 	"io"
 	"github.com/s-gv/femtowiki/static"
+	"github.com/s-gv/femtowiki/models"
 )
 
-var IndexHandler = UA(func(w http.ResponseWriter, r *http.Request, ctx *Context) {
-	if r.URL.Path != "/" {
-		ErrNotFoundHandler(w, r)
-		return
-	}
-	templates.Render(w, "index.html", map[string]interface{}{
+var SearchHandler = UA(func(w http.ResponseWriter, r *http.Request, ctx *Context) {
+	searchTerms := r.FormValue("q")
+	results := models.PageSearch(searchTerms)
+	templates.Render(w, "search.html", map[string]interface{}{
 		"ctx": ctx,
-		"IsEditMode": true,
+		"Results": results,
+		"SearchTerms": searchTerms,
 	})
 })
 

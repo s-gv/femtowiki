@@ -8,8 +8,8 @@ const indexSrc = `
 {{ define "content" }}
 <div id="section-tabs">
 	<div id="section-search">
-		<form method="GET" action="">
-			<input type="text" name="query" placeholder="Search Femtowiki">
+		<form method="GET" action="/search">
+			<input type="text" name="q" placeholder="Search Femtowiki">
 			<input class="btn btn-default" type="submit" value="Search">
 		</form>
 	</div>

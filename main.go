@@ -173,6 +173,8 @@ func main() {
 	mux.HandleFunc("/newfile", views.FileCreateHandler)
 	mux.HandleFunc("/editfile", views.FileUpdateHandler)
 
+	mux.HandleFunc("/search", views.SearchHandler)
+
 	if *fcgiMode {
 		fcgi.Serve(nil, mux)
 		return

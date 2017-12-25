@@ -89,7 +89,17 @@ func Migration1() {
 	db.Exec(`CREATE INDEX uploads_name_index on uploads(name);`)
 	db.Exec(`CREATE INDEX uploads_editgroupid_index on uploads(editgroupid);`)
 	db.Exec(`CREATE INDEX uploads_readgroupid_index on uploads(readgroupid);`)
-	// db.Exec(`CREATE VIRTUAL TABLE email USING fts5(sender, title, body);`)
+
+	db.Exec(`CREATE VIRTUAL TABLE pages_search_index USING fts5(title, content);`)
+	db.Exec(`CREATE TRIGGER after_page_insert AFTER INSERT ON pages BEGIN
+		INSERT INTO pages_search_index(rowid, title, content) VALUES(new.id, new.title, new.content);
+	END;`)
+	db.Exec(`CREATE TRIGGER after_page_update UPDATE OF content ON pages BEGIN
+		UPDATE pages_search_index SET content=new.content WHERE rowid=old.id;
+	END;`)
+	db.Exec(`CREATE TRIGGER after_page_delete AFTER DELETE ON pages BEGIN
+		DELETE FROM pages_search_index WHERE rowid=old.id;
+	END;`)
 }
 
 func IsMigrationNeeded() bool {
