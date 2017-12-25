@@ -7,47 +7,46 @@ package models
 import (
 	"database/sql"
 	"github.com/s-gv/femtowiki/models/db"
-	"errors"
 )
 
 const (
 	EverybodyGroup = "everybody"
 )
 
-func ReadCRUDGroup() string {
-	CRUDGroup := ReadConfig(CRUDGroup)
+func ReadPageMasterGroup() string {
+	pageMasterGroup := ReadConfig(PageMasterGroup)
 	var tmp string
-	if db.QueryRow(`SELECT id FROM groups WHERE name=?;`, CRUDGroup).Scan(&tmp) == sql.ErrNoRows {
-		CRUDGroup = DefaultCRUDGroup
+	if db.QueryRow(`SELECT id FROM groups WHERE name=?;`, pageMasterGroup).Scan(&tmp) == sql.ErrNoRows {
+		pageMasterGroup = DefaultPageMasterGroup
 	}
-	return CRUDGroup
+	return pageMasterGroup
 }
 
 func ReadFileMasterGroup() string {
 	fileMasterGroup := ReadConfig(FileMasterGroup)
 	var tmp string
-	if db.QueryRow(`SELECT id FROM groups WHERE name=?;`, FileMasterGroup).Scan(&tmp) == sql.ErrNoRows {
+	if db.QueryRow(`SELECT id FROM groups WHERE name=?;`, fileMasterGroup).Scan(&tmp) == sql.ErrNoRows {
 		fileMasterGroup = DefaultFileMasterGroup
 	}
 	return fileMasterGroup
 }
 
-func IsUserInCRUDGroup(username string) error {
+func IsUserInPageMasterGroup(username string) bool {
 	if username != "" {
-		CRUDGroup := ReadCRUDGroup()
-		if CRUDGroup == EverybodyGroup {
-			return nil
+		pageMasterGroup := ReadPageMasterGroup()
+		if pageMasterGroup == EverybodyGroup {
+			return true
 		}
-		row := db.QueryRow(`SELECT groupmembers.id FROM groupmembers INNER JOIN groups ON groups.id=groupmembers.groupid AND groups.name=? INNER JOIN users ON users.id=groupmembers.userid AND users.username=?;`, CRUDGroup, username)
+		row := db.QueryRow(`SELECT groupmembers.id FROM groupmembers INNER JOIN groups ON groups.id=groupmembers.groupid AND groups.name=? INNER JOIN users ON users.id=groupmembers.userid AND users.username=?;`, pageMasterGroup, username)
 		var tmp string
 		if row.Scan(&tmp) == nil {
-			return nil
+			return true
 		}
 	}
-	return errors.New("Access denied.")
+	return false
 }
 
-func IsUserInPageMasterGroup(username string) bool {
+func IsUserInFileMasterGroup(username string) bool {
 	if username != "" {
 		fileMasterGroup := ReadFileMasterGroup()
 		if fileMasterGroup == EverybodyGroup {

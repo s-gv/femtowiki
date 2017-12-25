@@ -162,7 +162,8 @@ func main() {
 	mux.HandleFunc("/admin/groupmembers", views.AdminGroupMembersHandler)
 	mux.HandleFunc("/admin/groupmembers/new", views.AdminGroupMemberCreateHandler)
 	mux.HandleFunc("/admin/groupmembers/delete", views.AdminGroupMemberDeleteHandler)
-	mux.HandleFunc("/admin/crudgroup", views.AdminCRUDGroupHandler)
+	mux.HandleFunc("/admin/pagemaster", views.AdminPageMasterGroupHandler)
+	mux.HandleFunc("/admin/filemaster", views.AdminFileMasterGroupHandler)
 
 	mux.HandleFunc("/pages/", views.PagesHandler)
 	mux.HandleFunc("/newpage", views.PageCreateHandler)

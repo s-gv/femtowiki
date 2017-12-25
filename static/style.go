@@ -279,6 +279,10 @@ textarea:focus, input[type="text"]:focus, input[type="password"]:focus, input[ty
 	background-color: #d32f2f;
 	cursor: pointer;
 }
+.btn:disabled {
+	background-color: #aaa;
+	cursor: auto;
+}
 
 /* flash message */
 .flash {

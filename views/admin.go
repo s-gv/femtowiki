@@ -18,10 +18,10 @@ var AdminHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *Context) 
 		ErrForbiddenHandler(w, r)
 		return
 	}
-
 	templates.Render(w, "admin.html", map[string]interface{}{
 		"ctx": ctx,
-		"crudgroup": models.ReadCRUDGroup(),
+		"PageMasterGroup": models.ReadPageMasterGroup(),
+		"FileMasterGroup": models.ReadFileMasterGroup(),
 		"config": models.ReadConfig(models.ConfigJSON),
 		"header": models.ReadConfig(models.HeaderLinks),
 		"footer": models.ReadConfig(models.FooterLinks),
@@ -35,17 +35,32 @@ var AdminHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *Context) 
 	})
 })
 
-var AdminCRUDGroupHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *Context) {
+var AdminPageMasterGroupHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *Context) {
 	if !ctx.IsAdmin || r.Method != "POST" {
 		ErrForbiddenHandler(w, r)
 		return
 	}
-	CRUDGroup := r.PostFormValue("crudgroup")
+	group := r.PostFormValue("group")
 	var tmp string
-	if CRUDGroup == models.EverybodyGroup || db.QueryRow(`SELECT id FROM groups WHERE name=?;`, CRUDGroup).Scan(&tmp) == nil {
-		models.WriteConfig(models.CRUDGroup, CRUDGroup)
+	if group == models.EverybodyGroup || db.QueryRow(`SELECT id FROM groups WHERE name=?;`, group).Scan(&tmp) == nil {
+		models.WriteConfig(models.PageMasterGroup, group)
 	} else {
-		ctx.SetFlashMsg("Group '"+CRUDGroup+"' not found")
+		ctx.SetFlashMsg("Group '"+ group +"' not found")
+	}
+	http.Redirect(w, r, "/admin", http.StatusSeeOther)
+})
+
+var AdminFileMasterGroupHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *Context) {
+	if !ctx.IsAdmin || r.Method != "POST" {
+		ErrForbiddenHandler(w, r)
+		return
+	}
+	group := r.PostFormValue("group")
+	var tmp string
+	if group == models.EverybodyGroup || db.QueryRow(`SELECT id FROM groups WHERE name=?;`, group).Scan(&tmp) == nil {
+		models.WriteConfig(models.FileMasterGroup, group)
+	} else {
+		ctx.SetFlashMsg("Group '"+ group +"' not found")
 	}
 	http.Redirect(w, r, "/admin", http.StatusSeeOther)
 })

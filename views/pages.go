@@ -26,7 +26,7 @@ func init() {
 }
 
 var PagesHandler = UA(func(w http.ResponseWriter, r *http.Request, ctx *Context) {
-	isCRUDGroupMember := (models.IsUserInCRUDGroup(ctx.UserName) == nil)
+	isPageMaster := ctx.IsAdmin || models.IsUserInPageMasterGroup(ctx.UserName)
 	title := models.IndexPage
 	cTitle := strings.Replace(title, " ", "_", -1)
 	isDiscussion := (r.FormValue("d") != "")
@@ -40,7 +40,7 @@ var PagesHandler = UA(func(w http.ResponseWriter, r *http.Request, ctx *Context)
 	}
 	if title == "" {
 		// List all pages
-		if !ctx.IsAdmin && !isCRUDGroupMember {
+		if !isPageMaster {
 			templates.Render(w, "accessdenied.html", map[string]interface{}{
 				"ctx": ctx,
 			})
@@ -87,7 +87,7 @@ var PagesHandler = UA(func(w http.ResponseWriter, r *http.Request, ctx *Context)
 		ErrNotFoundHandler(w, r)
 		return
 	}
-	if !ctx.IsAdmin && !isCRUDGroupMember && readGroupID.Valid {
+	if !isPageMaster && readGroupID.Valid {
 		row := db.QueryRow(`SELECT groupmembers.id FROM groupmembers INNER JOIN users ON users.id=groupmembers.userid AND users.username=? WHERE groupmembers.groupid=?;`, ctx.UserName, readGroupID)
 		var tmp string
 		if row.Scan(&tmp) != nil {
@@ -168,8 +168,8 @@ var PageCreateHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *Cont
 		ErrForbiddenHandler(w, r)
 		return
 	}
-	isCRUDGroupMember := (models.IsUserInCRUDGroup(ctx.UserName) == nil)
-	if !ctx.IsAdmin && !isCRUDGroupMember {
+	isPageMaster := ctx.IsAdmin || models.IsUserInPageMasterGroup(ctx.UserName)
+	if !isPageMaster {
 		templates.Render(w, "accessdenied.html", map[string]interface{}{
 			"ctx": ctx,
 		})
@@ -191,10 +191,10 @@ var PageCreateHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *Cont
 	content := "# "+title
 	tNow := time.Now().Unix()
 	db.Exec(`INSERT INTO pages(title, content, discussion, created_date, updated_date) VALUES(?, ?, ?, ?, ?);`, title, content, content, tNow, tNow)
-	CRUDGroup := models.ReadCRUDGroup()
-	if CRUDGroup != models.DefaultCRUDGroup {
+	pageMasterGroup := models.ReadPageMasterGroup()
+	if pageMasterGroup != models.DefaultPageMasterGroup {
 		var gID string
-		if db.QueryRow(`SELECT id FROM groups WHERE name=?;`, CRUDGroup).Scan(&gID) == nil {
+		if db.QueryRow(`SELECT id FROM groups WHERE name=?;`, pageMasterGroup).Scan(&gID) == nil {
 			db.Exec(`UPDATE pages SET editgroupid=? WHERE title=?;`, gID, title)
 		}
 	}
@@ -202,14 +202,14 @@ var PageCreateHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *Cont
 })
 
 var PageEditHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *Context) {
-	isCRUDGroupMember := (models.IsUserInCRUDGroup(ctx.UserName) == nil)
+	isPageMaster := ctx.IsAdmin || models.IsUserInPageMasterGroup(ctx.UserName)
 	cTitle := r.FormValue("t")
 	title := strings.Replace(cTitle, "_", " ", -1)
 	isDiscussion := (r.FormValue("d") != "")
 
 	var editGroupID sql.NullString
 	db.QueryRow(`SELECT editGroupID FROM pages WHERE title=?;`, title).Scan(&editGroupID)
-	if !ctx.IsAdmin && !isCRUDGroupMember && editGroupID.Valid {
+	if !isPageMaster && editGroupID.Valid {
 		var tmp string
 		row := db.QueryRow(`SELECT groupmembers.id FROM groupmembers INNER JOIN users ON users.id=groupmembers.userid AND users.username=? WHERE groupmembers.groupid=?;`, ctx.UserName, editGroupID)
 		if row.Scan(&tmp) != nil {
@@ -256,7 +256,7 @@ var PageEditHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *Contex
 				}
 			}
 			if action == "Delete" {
-				if !ctx.IsAdmin && !isCRUDGroupMember {
+				if !isPageMaster {
 					templates.Render(w, "accessdenied.html", map[string]interface{}{
 						"ctx": ctx,
 					})

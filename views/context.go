@@ -22,7 +22,6 @@ type Context struct {
 	IsAdmin          bool
 	CSRFToken        string
 	FlashMsg         string
-	IsPageCRUDMember bool
 	PageTitle		 string
 	Config		     WikiConfig
 	HeaderLinks      []NavLink
@@ -84,11 +83,6 @@ func ReadContext(sessionID string) Context {
 				ctx.IsAdmin = isAdmin
 				ctx.IsUserValid = true
 				ctx.CSRFToken = csrftoken
-
-				CRUDGroup := models.ReadCRUDGroup()
-				row := db.QueryRow(`SELECT groupmembers.id FROM groupmembers INNER JOIN groups ON groups.id=groupmembers.groupid AND groups.name=? INNER JOIN users ON users.id=groupmembers.userid AND users.username=?;`, CRUDGroup, ctx.UserName)
-				var tmp string
-				ctx.IsPageCRUDMember = ctx.IsAdmin || (CRUDGroup == models.EverybodyGroup) || (row.Scan(&tmp) == nil)
 			} else {
 				// Session expired
 				//log.Printf("[INFO] Attempted to use expired session (id: %s)\n", sessionID)

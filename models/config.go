@@ -8,7 +8,7 @@ import "github.com/s-gv/femtowiki/models/db"
 
 const (
 	Version         = "version"
-	CRUDGroup       = "crud_group"
+	PageMasterGroup = "page_master_group"
 	FileMasterGroup = "file_master_group"
 	ConfigJSON      = "config_json"
 	HeaderLinks     = "header_links"
@@ -28,9 +28,9 @@ const (
 	"SMTPPasswd": "",
 	"FromEmail": ""
 }`
-	DefaultCRUDGroup = EverybodyGroup
+	DefaultPageMasterGroup = EverybodyGroup
 	DefaultFileMasterGroup = EverybodyGroup
-	DefaultHeaderLinks = `[
+	DefaultHeaderLinks     = `[
 	{"Title": "Home", "URL": "/"},
 	{"Title": "Download", "URL": "http://www.goodoldweb.com/"}
 ]`

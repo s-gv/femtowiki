@@ -114,7 +114,7 @@ func Migrate() {
 			WriteConfig(FooterLinks, DefaultFooterLinks)
 			WriteConfig(NavSections, DefaultNavSections)
 			WriteConfig(IllegalNames, DefaultIllegalNames)
-			WriteConfig(CRUDGroup, DefaultCRUDGroup)
+			WriteConfig(PageMasterGroup, DefaultPageMasterGroup)
 			db.Exec(`INSERT INTO pages(title, content, created_date, updated_date) VALUES(?, ?, ?, ?);`, IndexPage, "# Home Page", time.Now().Unix(), time.Now().Unix())
 		}
 		dbver = db.Version()

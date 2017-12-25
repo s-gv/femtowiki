@@ -17,15 +17,30 @@ const adminSrc = `
 
 	<h3><a href="/admin/users">Users</a></h3>
 	<h3><a href="/admin/groups">Groups</a></h3>
-	<form action="/admin/crudgroup" method="POST">
+	<form action="/admin/pagemaster" method="POST">
 		<input type="hidden" name="csrf" value="{{ .ctx.CSRFToken }}">
-		<h3>Group permitted to create/delete pages</h3>
+		<h3>PageMaster group</h3>
 		<p>
-			Members of this group will be permitted to create new pages or delete existing pages in the wiki.
+			Members of this group will be permitted to create new pages and delete existing pages in the wiki.
 			Note that the group 'everybody' is a special group that includes all registered users.
 		</p>
 		<div class="form-group">
-			<input type="text" class="form-control" name="crudgroup" value="{{ .crudgroup }}" placeholder="Group name">
+			<input type="text" class="form-control" name="group" value="{{ .PageMasterGroup }}" placeholder="Group name">
+		</div>
+		<input type="submit" class="btn btn-default" value="Update">
+	</form>
+</div>
+
+<div class="form-container">
+	<form action="/admin/filemaster" method="POST">
+		<input type="hidden" name="csrf" value="{{ .ctx.CSRFToken }}">
+		<h3>FileMaster group</h3>
+		<p>
+			Members of this group will be permitted to upload and delete files in the wiki.
+			Note that the group 'everybody' is a special group that includes all registered users.
+		</p>
+		<div class="form-group">
+			<input type="text" class="form-control" name="group" value="{{ .FileMasterGroup }}" placeholder="Group name">
 		</div>
 		<input type="submit" class="btn btn-default" value="Update">
 	</form>

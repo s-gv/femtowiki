@@ -33,7 +33,7 @@ var pageListSrc = `
 				<input type="submit" class="btn btn-default" name="action" value="Update"{{ if not $.ctx.IsAdmin}} disabled{{ end }}>
 			</div>
 			<div class="tcol6">
-				<input type="submit" class="btn btn-danger" name="action" value="Delete">
+				<input type="submit" class="btn btn-danger" name="action" value="Delete" onclick="return confirm('Are you sure you want to delete this page?');">
 			</div>
 		</form>
 	</div>

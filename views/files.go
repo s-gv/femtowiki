@@ -18,7 +18,7 @@ import (
 )
 
 var FilesHandler = UA(func(w http.ResponseWriter, r *http.Request, ctx *Context) {
-	isPageMaster := ctx.IsAdmin || models.IsUserInPageMasterGroup(ctx.UserName)
+	isPageMaster := ctx.IsAdmin || models.IsUserInFileMasterGroup(ctx.UserName)
 	cTitle := r.URL.Path[7:] // r.URL will be /files/<page_title>
 	title := strings.Replace(cTitle, "_", " ", -1)
 	if title == "" {
@@ -88,7 +88,7 @@ var FileCreateHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *Cont
 		ErrForbiddenHandler(w, r)
 		return
 	}
-	isPageMaster := ctx.IsAdmin || models.IsUserInPageMasterGroup(ctx.UserName)
+	isPageMaster := ctx.IsAdmin || models.IsUserInFileMasterGroup(ctx.UserName)
 	if !isPageMaster {
 		templates.Render(w, "accessdenied.html", map[string]interface{}{
 			"ctx": ctx,
@@ -140,7 +140,7 @@ var FileUpdateHandler = A(func(w http.ResponseWriter, r *http.Request, ctx *Cont
 		ErrForbiddenHandler(w, r)
 		return
 	}
-	isPageMaster := ctx.IsAdmin || models.IsUserInPageMasterGroup(ctx.UserName)
+	isPageMaster := ctx.IsAdmin || models.IsUserInFileMasterGroup(ctx.UserName)
 	if !isPageMaster {
 		templates.Render(w, "accessdenied.html", map[string]interface{}{
 			"ctx": ctx,
