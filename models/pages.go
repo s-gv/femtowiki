@@ -9,6 +9,7 @@ import (
 	"github.com/s-gv/femtowiki/models/db"
 	"html/template"
 	"regexp"
+	"strings"
 )
 
 var (
@@ -47,6 +48,7 @@ func PageSearch(terms string) []PagesSearchResult {
 		var snippet string
 		rows.Scan(&res.Title, &snippet)
 		res.Snippet = template.HTML(snippetRe.ReplaceAllString(template.HTMLEscapeString(snippet), "<b>$1</b>"))
+		res.CTitle = strings.Replace(res.Title, " ", "_", -1)
 		results = append(results, res)
 	}
 	return results

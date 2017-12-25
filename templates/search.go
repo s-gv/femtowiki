@@ -15,7 +15,7 @@ const searchSrc = `
 	</div>
 	{{ range .Results }}
 		<div style="margin-top: 15px;">
-			<div style="font-size: 18px;"><a href="{{ .CTitle }}">{{ .Title }}</a></div>
+			<div style="font-size: 18px;"><a href="/pages/{{ .CTitle }}">{{ .Title }}</a></div>
 			<div>{{ .Snippet }}</div>
 		</div>
 	{{ end }}
