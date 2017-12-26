@@ -46,7 +46,7 @@ func PageSearch(terms string) []PagesSearchResult {
 	if db.DriverName == "sqlite3" {
 		rows = db.Query(`SELECT title, snippet(pages_search, 1, '__', '__', '', 20) FROM pages_search WHERE pages_search MATCH ? ORDER BY rank LIMIT 20;`, terms)
 	} else if db.DriverName == "postgres" {
-		rows = db.Query(`SELECT title, ts_headline(content, keywords, 'StartSel=__,StopSel=__') AS snippet FROM pages, to_tsquery(?) AS keywords WHERE vectors @@ keywords;`, terms)
+		rows = db.Query(`SELECT title, ts_headline(content, keywords, 'StartSel=__,StopSel=__') AS snippet FROM pages, to_tsquery(?) AS keywords WHERE vectors @@ keywords LIMIT 20;`, terms)
 	}
 	if rows != nil {
 		for rows.Next() {
