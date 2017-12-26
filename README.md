@@ -56,7 +56,7 @@ Options
 
 To use postgres, run `./femtowiki -dbdriver postgres -dsn postgres://pguser:pgpasswd@localhost/dbname`
 
-To save an sqlite db at a different location, run `./femtowiki -dsn path/to/myforum.db`.
+To save an sqlite db at a different location, run `./femtowiki -dsn path/to/mywiki.db`.
 
 Commands
 --------
