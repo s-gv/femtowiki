@@ -1,7 +1,8 @@
 femtowiki
 =========
 
-[Femtowiki](http://www.goodoldweb.com) is a tiny wiki written in golang. It has few dependencies and uses very little javascript.
+[Femtowiki](http://www.goodoldweb.com) is a tiny wiki written in golang. It allows users to create pages using markdown.
+The wiki few dependencies and uses very little javascript.
 Try the latest version hosted [here](https://wiki.goodoldweb.com). Please contact [info@goodoldweb.com](mailto:info@goodoldweb.com)
 if you have any questions or want support.
 
@@ -30,7 +31,7 @@ Finally, start the server:
 Notes
 -----
 
-Femtowiki allows users to create, modify, and delete pages and files.
+Femtowiki allows users to create wiki pages using markdown.
 Admin users control who can perform various actions with the following level of granularity.
 
 - Users belonging to the `PageMaster` group can create, modify, and delete all pages.
