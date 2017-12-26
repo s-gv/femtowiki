@@ -132,7 +132,7 @@ func Exec(query string, args ...interface{}) {
 }
 
 func Version() int {
-	row := db.QueryRow(`SELECT val FROM configs WHERE name=?;`, "version")
+	row := db.QueryRow(translate(`SELECT val FROM configs WHERE name=?;`), "version")
 	sval := "0"
 	if err := row.Scan(&sval); err == nil {
 		if ival, err := strconv.Atoi(sval); err == nil {
