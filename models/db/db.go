@@ -15,7 +15,7 @@ import (
 
 
 var db *sql.DB
-var dbDriverName string
+var DriverName string
 
 var stmts = make(map[string]*sql.Stmt)
 
@@ -33,7 +33,7 @@ func Init(driverName string, dataSourceName string) {
 		log.Panicf("[ERROR] Error opening DB: %s\n", err)
 	}
 	db = mydb
-	dbDriverName = driverName
+	DriverName = driverName
 	if driverName == "sqlite3" {
 		db.Exec("PRAGMA journal_mode = WAL;")
 		db.Exec("PRAGMA synchronous = FULL;")
@@ -42,7 +42,7 @@ func Init(driverName string, dataSourceName string) {
 }
 
 func translate(query string) string {
-	if dbDriverName == "postgres" {
+	if DriverName == "postgres" {
 		query = strings.Replace(query, "INTEGER PRIMARY KEY AUTOINCREMENT", "SERIAL PRIMARY KEY", -1)
 		query = strings.Replace(query, "MAX(_ROWID_)", "COUNT(*)", -1)
 		p := 0

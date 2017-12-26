@@ -13,11 +13,15 @@ const searchSrc = `
 			<input class="btn btn-inline btn-default" style="width: 20%;" type="submit" value="Search">
 		</form>
 	</div>
+	{{ if .Results }}
 	{{ range .Results }}
 		<div style="margin-top: 15px;">
 			<div style="font-size: 18px;"><a href="/pages/{{ .CTitle }}">{{ .Title }}</a></div>
 			<div>{{ .Snippet }}</div>
 		</div>
+	{{ end }}
+	{{ else }}
+	<p>No pages found</p>
 	{{ end }}
 </div>
 {{ end }}

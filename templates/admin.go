@@ -15,6 +15,12 @@ const adminSrc = `
 	</div>
 	{{ end }}
 
+	{{ if .ctx.AdminErrMsg }}
+	<div class="form-group">
+		<span class="flash">{{ .ctx.AdminErrMsg }}</span>
+	</div>
+	{{ end }}
+
 	<h3><a href="/admin/users">Users</a></h3>
 	<h3><a href="/admin/groups">Groups</a></h3>
 	<form action="/admin/pagemaster" method="POST">

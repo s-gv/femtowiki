@@ -20,6 +20,7 @@ type Context struct {
 	UserName         string
 	IsUserValid      bool
 	IsAdmin          bool
+	AdminErrMsg      string
 	CSRFToken        string
 	FlashMsg         string
 	PageTitle		 string
@@ -103,6 +104,7 @@ func ReadContext(sessionID string) Context {
 		} else {
 			json.Unmarshal([]byte(models.DefaultConfigJSON), &configCache)
 			log.Printf("[ERROR] Invalid config: %s\n", configJSON)
+			ctx.AdminErrMsg += "Invalid config."
 		}
 
 		headerJSON := models.ReadConfig(models.HeaderLinks)
@@ -112,6 +114,7 @@ func ReadContext(sessionID string) Context {
 		} else {
 			json.Unmarshal([]byte(models.DefaultHeaderLinks), &headerLinksCache)
 			log.Printf("[ERROR] Invalid header links: %s\n", headerJSON)
+			ctx.AdminErrMsg += "Invalid header JSON."
 		}
 
 		footerJSON := models.ReadConfig(models.FooterLinks)
@@ -121,6 +124,7 @@ func ReadContext(sessionID string) Context {
 		} else {
 			json.Unmarshal([]byte(models.DefaultFooterLinks), &footerLinksCache)
 			log.Printf("[ERROR] Invalid footer links: %s\n", footerJSON)
+			ctx.AdminErrMsg += "Invalid footer JSON."
 		}
 
 		navJSON := models.ReadConfig(models.NavSections)
@@ -130,6 +134,7 @@ func ReadContext(sessionID string) Context {
 		} else {
 			json.Unmarshal([]byte(models.DefaultNavSections), &navSectionsCache)
 			log.Printf("[ERROR] Invalid nav sections: %s\n", navJSON)
+			ctx.AdminErrMsg += "Invalid nav JSON."
 		}
 
 		ctxCacheDate = time.Now()
@@ -139,6 +144,7 @@ func ReadContext(sessionID string) Context {
 	ctx.HeaderLinks = headerLinksCache
 	ctx.FooterLinks = footerLinksCache
 	ctx.NavSections = navSectionsCache
+
 
 	return ctx
 }

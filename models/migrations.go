@@ -28,10 +28,10 @@ func Migration1() {
 		created_date INTEGER DEFAULT 0,
 		updated_date INTEGER DEFAULT 0
 	);`)
-	db.Exec(`CREATE UNIQUE INDEX users_username_index on users(username);`)
-	db.Exec(`CREATE INDEX users_email_index on users(email);`)
-	db.Exec(`CREATE INDEX users_reset_token_index on users(reset_token);`)
-	db.Exec(`CREATE INDEX users_created_index on users(created_date);`)
+	db.Exec(`CREATE UNIQUE INDEX users_username_index ON users(username);`)
+	db.Exec(`CREATE INDEX users_email_index ON users(email);`)
+	db.Exec(`CREATE INDEX users_reset_token_index ON users(reset_token);`)
+	db.Exec(`CREATE INDEX users_created_index ON users(created_date);`)
 
 	db.Exec(`CREATE TABLE groups(
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -39,7 +39,7 @@ func Migration1() {
 		created_date INTEGER DEFAULT 0,
 		updated_date INTEGER DEFAULT 0
 	);`)
-	db.Exec(`CREATE UNIQUE INDEX groups_name_index on groups(name);`)
+	db.Exec(`CREATE UNIQUE INDEX groups_name_index ON groups(name);`)
 
 	db.Exec(`CREATE TABLE groupmembers(
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -47,8 +47,8 @@ func Migration1() {
 		groupid INTEGER REFERENCES groups(id) ON DELETE CASCADE,
 		created_date INTEGER DEFAULT 0
 	);`)
-	db.Exec(`CREATE INDEX groupmembers_userid_index on groupmembers(userid);`)
-	db.Exec(`CREATE INDEX groupmembers_groupid_index on groupmembers(groupid);`)
+	db.Exec(`CREATE INDEX groupmembers_userid_index ON groupmembers(userid);`)
+	db.Exec(`CREATE INDEX groupmembers_groupid_index ON groupmembers(groupid);`)
 
 	db.Exec(`CREATE TABLE sessions(
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -59,8 +59,8 @@ func Migration1() {
 		created_date INTEGER DEFAULT 0,
 		updated_date INTEGER DEFAULT 0
 	);`)
-	db.Exec(`CREATE INDEX sessions_sessionid_index on sessions(sessionid);`)
-	db.Exec(`CREATE INDEX sessions_userid_index on sessions(userid);`)
+	db.Exec(`CREATE INDEX sessions_sessionid_index ON sessions(sessionid);`)
+	db.Exec(`CREATE INDEX sessions_userid_index ON sessions(userid);`)
 
 	db.Exec(`CREATE TABLE pages(
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -74,8 +74,8 @@ func Migration1() {
 		updated_date INTEGER DEFAULT 0
 	);`)
 	db.Exec(`CREATE INDEX pages_title_index on pages(title);`)
-	db.Exec(`CREATE INDEX pages_editgroupid_index on pages(editgroupid);`)
-	db.Exec(`CREATE INDEX pages_readgroupid_index on pages(readgroupid);`)
+	db.Exec(`CREATE INDEX pages_editgroupid_index ON pages(editgroupid);`)
+	db.Exec(`CREATE INDEX pages_readgroupid_index ON pages(readgroupid);`)
 
 	db.Exec(`CREATE TABLE uploads(
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -86,20 +86,30 @@ func Migration1() {
 		created_date INTEGER DEFAULT 0,
 		updated_date INTEGER DEFAULT 0
 	);`)
-	db.Exec(`CREATE INDEX uploads_name_index on uploads(name);`)
-	db.Exec(`CREATE INDEX uploads_editgroupid_index on uploads(editgroupid);`)
-	db.Exec(`CREATE INDEX uploads_readgroupid_index on uploads(readgroupid);`)
+	db.Exec(`CREATE INDEX uploads_name_index ON uploads(name);`)
+	db.Exec(`CREATE INDEX uploads_editgroupid_index ON uploads(editgroupid);`)
+	db.Exec(`CREATE INDEX uploads_readgroupid_index ON uploads(readgroupid);`)
 
-	db.Exec(`CREATE VIRTUAL TABLE pages_search_index USING fts5(title, content);`)
-	db.Exec(`CREATE TRIGGER after_page_insert AFTER INSERT ON pages BEGIN
-		INSERT INTO pages_search_index(rowid, title, content) VALUES(new.id, new.title, new.content);
-	END;`)
-	db.Exec(`CREATE TRIGGER after_page_update UPDATE OF content ON pages BEGIN
-		UPDATE pages_search_index SET content=new.content WHERE rowid=old.id;
-	END;`)
-	db.Exec(`CREATE TRIGGER after_page_delete AFTER DELETE ON pages BEGIN
-		DELETE FROM pages_search_index WHERE rowid=old.id;
-	END;`)
+	if db.DriverName == "sqlite3" {
+		db.Exec(`CREATE VIRTUAL TABLE pages_search USING fts5(title, content);`)
+		db.Exec(`CREATE TRIGGER after_page_insert AFTER INSERT ON pages FOR EACH ROW BEGIN
+			INSERT INTO pages_search(rowid, title, content) VALUES(new.id, new.title, new.content);
+		END;`)
+		db.Exec(`CREATE TRIGGER after_page_update UPDATE OF content ON pages FOR EACH ROW BEGIN
+			UPDATE pages_search SET content=new.content WHERE rowid=old.id;
+		END;`)
+		db.Exec(`CREATE TRIGGER after_page_delete AFTER DELETE ON pages FOR EACH ROW BEGIN
+			DELETE FROM pages_search WHERE rowid=old.id;
+		END;`)
+	} else if db.DriverName == "postgres" {
+		db.Exec(`ALTER TABLE pages ADD COLUMN vectors tsvector;`)
+		db.Exec(`CREATE INDEX pages_search_index ON pages USING GIN(vectors);`)
+		db.Exec(`CREATE TRIGGER trigger_pages_vectors BEFORE INSERT OR UPDATE ON pages
+			FOR EACH ROW EXECUTE PROCEDURE tsvector_update_trigger(vectors, 'pg_catalog.english', content);`)
+	} else {
+		log.Fatalf("[ERROR] DB Driver %s not supported\n", db.DriverName)
+	}
+
 }
 
 func IsMigrationNeeded() bool {

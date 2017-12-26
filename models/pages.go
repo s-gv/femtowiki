@@ -41,15 +41,22 @@ func IsPageTitleValid(title string) error {
 }
 
 func PageSearch(terms string) []PagesSearchResult {
-	rows := db.Query(`SELECT title, snippet(pages_search_index, 1, '__', '__', '', 20) FROM pages_search_index WHERE pages_search_index MATCH ?;`, terms)
 	results := []PagesSearchResult{}
-	for rows.Next() {
-		res := PagesSearchResult{}
-		var snippet string
-		rows.Scan(&res.Title, &snippet)
-		res.Snippet = template.HTML(snippetRe.ReplaceAllString(template.HTMLEscapeString(snippet), "<b>$1</b>"))
-		res.CTitle = strings.Replace(res.Title, " ", "_", -1)
-		results = append(results, res)
+	var rows *db.Rows
+	if db.DriverName == "sqlite3" {
+		rows = db.Query(`SELECT title, snippet(pages_search, 1, '__', '__', '', 20) FROM pages_search WHERE pages_search MATCH ? ORDER BY rank LIMIT 20;`, terms)
+	} else if db.DriverName == "postgres" {
+		rows = db.Query(`SELECT title, ts_headline(content, keywords, 'StartSel=__,StopSel=__') AS snippet FROM pages, to_tsquery(?) AS keywords WHERE vectors @@ keywords;`, terms)
+	}
+	if rows != nil {
+		for rows.Next() {
+			res := PagesSearchResult{}
+			var snippet string
+			rows.Scan(&res.Title, &snippet)
+			res.Snippet = template.HTML(snippetRe.ReplaceAllString(template.HTMLEscapeString(snippet), "<b>$1</b>"))
+			res.CTitle = strings.Replace(res.Title, " ", "_", -1)
+			results = append(results, res)
+		}
 	}
 	return results
 }
