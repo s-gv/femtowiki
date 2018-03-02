@@ -1,7 +1,7 @@
 femtowiki
 =========
 
-[Femtowiki](http://www.goodoldweb.com) is a tiny wiki written in golang. It allows users to create pages using markdown.
+[Femtowiki](http://www.goodoldweb.com/femtowiki/) is a tiny wiki written in golang. It allows users to create pages using markdown.
 The wiki few dependencies and uses very little javascript.
 Try the latest version hosted [here](https://wiki.goodoldweb.com). Please contact [info@goodoldweb.com](mailto:info@goodoldweb.com)
 if you have any questions or want support.
