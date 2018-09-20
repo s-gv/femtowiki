@@ -19,7 +19,7 @@ import (
 	"regexp"
 )
 
-var titleRegex *regexp.Regexp
+var titleRegex *regexp.Regexp = regexp.MustCompile("<h1>([^<>/]+)</h1>")
 
 func renderMd(markdown string) string {
 	unsafe := blackfriday.Run([]byte(strings.Replace(markdown, "\r\n", "\n", -1)))
@@ -46,7 +46,7 @@ func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
 	wikiRoot := flag.String("wikiroot", "", "Root of the wiki")
-	//templateRoot := flag.String("templateroot", "", "Root of template files")
+	templateRoot := flag.String("templateroot", "", "Root of template files")
 
 	flag.Parse()
 
@@ -54,7 +54,9 @@ func main() {
 		log.Fatalf("[ERROR] Specify wiki root\n")
 	}
 
-	titleRegex = regexp.MustCompile("<h1>([^<>/]+)</h1>")
+	if *templateRoot != "" {
+		templates.OverwriteTemplates(*templateRoot)
+	}
 
 	err := filepath.Walk(*wikiRoot,
 		func(path string, info os.FileInfo, err error) error {
