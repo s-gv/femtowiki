@@ -16,8 +16,6 @@ How to use
 - To use this as a static site generator, do the following:
 
 Create a few markdown files (with extension .md) in a directory, say `/home/user/wikiroot/`.
-One file, `nav.md`, is special, and is used to create the nav bar that will be used in every
-page.
 
 Then, run:
 
@@ -33,6 +31,8 @@ To specify custom templates, use:
 ```
 
 - If you'd like to be able to edit the wiki in a browser, then create a new user with:
+
+TODO: Current version does not yet support this!
 
 ```
 ./femtowiki -createuser -users <path/to/wikiusers.json>
